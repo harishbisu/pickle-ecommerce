@@ -9,6 +9,5 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # Add other environment variables needed for your NestJS app here
       - key: PORT
         value: 10000
