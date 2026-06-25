@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: pickle-ecommerce-server
+    env: node
+    # Since this is a monorepo, we build from the root using Turbo
+    buildCommand: npm install && npx turbo run build --filter=server
+    # Start the NestJS server
+    startCommand: npm run start:prod --workspace=apps/server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Add other environment variables needed for your NestJS app here
+      - key: PORT
+        value: 10000

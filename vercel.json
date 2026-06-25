@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "buildCommand": "npx turbo run build --filter=client",
+  "outputDirectory": "apps/client/.next",
+  "framework": "nextjs",
+  "ignoreCommand": "npx turbo-ignore"
+}
