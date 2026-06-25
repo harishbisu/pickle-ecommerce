@@ -32,71 +32,96 @@ import { useCart } from "../../providers/CartContext";
 const FALLBACK_PRODUCTS: Product[] = [
   {
     id: 1,
-    name: "Spicy Mango Pickle",
-    price: "199",
+    name: "Spicy Mango 500gm",
     description:
-      "Sun-dried raw mangoes in aromatic mustard oil with hand-ground spices",
-    stock: 50,
+      "Delicious Lohagral Mongos. Specially handpicked fresh mangoes with love and passion.",
+    price: "200.00",
+    stock: 199,
     images: [
-      "https://th.bing.com/th/id/OIP.MDBve5I9-yoNFVxBAmK-UQHaHa?w=181&h=181&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+      "https://www.farmdidi.com/cdn/shop/files/Traditional_Mango.jpg?format=webp&quality=80&v=1781177208&width=450",
     ],
-    createdAt: "",
+    createdAt: "2026-06-25T12:45:45.572Z",
   },
   {
     id: 2,
-    name: "Garlic Pickle",
-    price: "249",
-    description:
-      "Whole garlic cloves slow-pickled in spiced vinegar, rich in antioxidants",
-    stock: 30,
+    name: "Nani's special pack | Pack of 8 (75gm)",
+    description: "Tasty, Spicy. Once you eat remember forever.",
+    price: "250.00",
+    stock: 112,
     images: [
-      "https://th.bing.com/th/id/OIP.Z2ONiI-ko832xPs29JOQ7QHaHa?w=215&h=215&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+      "https://www.farmdidi.com/cdn/shop/files/Nani_s_Pack_2.jpg?format=webp&quality=80&v=1781953727&width=450",
     ],
-    createdAt: "",
+    createdAt: "2026-06-25T12:47:07.045Z",
   },
   {
     id: 3,
-    name: "Mixed Veg Pickle",
-    price: "229",
-    description: "Seasonal vegetables pickled with 12 traditional spices",
-    stock: 45,
+    name: "Gajar Gobhi Shalgam Ka Mix Achar | Vegetable Pickle",
+    description:
+      "Fresh Gajar handpicked from our own farm house. For verfication please visit our youtube channel.",
+    price: "350.00",
+    stock: 221,
     images: [
-      "https://tse1.explicit.bing.net/th/id/OIP.DZ_Wg6x8LInFBT8-on0uOwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
+      "https://www.farmdidi.com/cdn/shop/files/Gajar_Gobhi_Pickle.jpg?format=webp&quality=80&v=1781175989&width=450",
     ],
-    createdAt: "",
+    createdAt: "2026-06-25T12:48:32.873Z",
   },
   {
     id: 4,
-    name: "Lemon Pickle",
-    price: "179",
-    description: "Zesty whole lemons pickled in oil with chilli and fenugreek",
-    stock: 60,
-    images: ["https://m.media-amazon.com/images/I/71dRCYmX6cL._SL1500_.jpg"],
-    createdAt: "",
+    name: "Green Chilli Pickle | Hari Mirch ka Achar",
+    description:
+      "Chilli's are handpicked from own farm. Check our own yt channel.",
+    price: "225.00",
+    stock: 123,
+    images: [
+      "https://www.farmdidi.com/cdn/shop/files/1._Product_page_1Kg_Green_Chilli_01.jpg?format=webp&quality=80&v=1758868494&width=450",
+    ],
+    createdAt: "2026-06-25T12:49:28.807Z",
   },
   {
     id: 5,
-    name: "Green Chilli Pickle",
-    price: "189",
+    name: "Crushed Lemon Pickle | Nimbu ka Achar",
     description:
-      "Fresh green chillies marinated in a bold mustard and vinegar base",
-    stock: 35,
+      "Chilli's are handpicked from own farm. Check our own yt channel.",
+    price: "321.00",
+    stock: 210,
     images: [
-      "https://th.bing.com/th/id/OIP.FA4_XAEfW0mvL3xapv1aRAHaNy?w=115&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+      "https://www.farmdidi.com/cdn/shop/files/Crushed_Lemon.jpg?format=webp&quality=80&v=1781175805&width=450",
     ],
-    createdAt: "",
+    createdAt: "2026-06-25T12:50:06.775Z",
   },
   {
     id: 6,
-    name: "Raw Papaya Pickle",
-    price: "219",
-    description:
-      "Crispy raw papaya strips pickled with ginger and traditional spices",
-    stock: 25,
+    name: "Amla Pickle | Amla ka Achar",
+    description: "Crushed Lemon Pickle | Nimbu ka Achar",
+    price: "299.00",
+    stock: 123,
     images: [
-      "https://images.unsplash.com/photo-1618897996318-5a901fa6ca71?w=600&auto=format&fit=crop&q=80",
+      "https://www.farmdidi.com/cdn/shop/files/Amla_Pickle.jpg?format=webp&quality=80&v=1781175477&width=450",
     ],
-    createdAt: "",
+    createdAt: "2026-06-25T12:50:39.599Z",
+  },
+  {
+    id: 7,
+    name: "Pickles trial pack | Pack of 4 (75g each)",
+    description:
+      "Chilli's are handpicked from own farm. Check our own yt channel.",
+    price: "245.00",
+    stock: 123,
+    images: [
+      "https://www.farmdidi.com/cdn/shop/files/Trial_Pack_1.jpg?format=webp&quality=80&v=1781954174&width=450",
+    ],
+    createdAt: "2026-06-25T12:51:24.151Z",
+  },
+  {
+    id: 8,
+    name: "Punjabi Mango Pickle Masala",
+    description: "Handmade by my dadi. She had 20 years of experience.",
+    price: "124.00",
+    stock: 123,
+    images: [
+      "https://www.farmdidi.com/cdn/shop/files/farmdidi-punjabi-mango-pickle-masala.jpg?format=webp&quality=80&v=1757930025&width=450",
+    ],
+    createdAt: "2026-06-25T12:52:17.337Z",
   },
 ];
 
