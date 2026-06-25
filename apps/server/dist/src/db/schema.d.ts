@@ -1,6 +1,7 @@
+export declare const ecomSchema: import("drizzle-orm/pg-core").PgSchema<"ecom">;
 export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "users";
-    schema: undefined;
+    schema: "ecom";
     columns: {
         id: import("drizzle-orm/pg-core").PgColumn<{
             name: "id";
@@ -126,7 +127,7 @@ export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
 }>;
 export declare const products: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "products";
-    schema: undefined;
+    schema: "ecom";
     columns: {
         id: import("drizzle-orm/pg-core").PgColumn<{
             name: "id";
@@ -269,7 +270,7 @@ export declare const products: import("drizzle-orm/pg-core").PgTableWithColumns<
 }>;
 export declare const orders: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "orders";
-    schema: undefined;
+    schema: "ecom";
     columns: {
         id: import("drizzle-orm/pg-core").PgColumn<{
             name: "id";
@@ -412,7 +413,7 @@ export declare const orders: import("drizzle-orm/pg-core").PgTableWithColumns<{
 }>;
 export declare const orderItems: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "order_items";
-    schema: undefined;
+    schema: "ecom";
     columns: {
         id: import("drizzle-orm/pg-core").PgColumn<{
             name: "id";
@@ -504,7 +505,7 @@ export declare const orderItems: import("drizzle-orm/pg-core").PgTableWithColumn
 }>;
 export declare const discounts: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "discounts";
-    schema: undefined;
+    schema: "ecom";
     columns: {
         id: import("drizzle-orm/pg-core").PgColumn<{
             name: "id";
@@ -613,7 +614,7 @@ export declare const discounts: import("drizzle-orm/pg-core").PgTableWithColumns
 }>;
 export declare const appSettings: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "app_settings";
-    schema: undefined;
+    schema: "ecom";
     columns: {
         id: import("drizzle-orm/pg-core").PgColumn<{
             name: "id";

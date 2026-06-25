@@ -1,11 +1,13 @@
-CREATE TABLE "app_settings" (
+CREATE SCHEMA "ecom";
+--> statement-breakpoint
+CREATE TABLE "ecom"."app_settings" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"setting_key" text NOT NULL,
 	"setting_value" text NOT NULL,
 	CONSTRAINT "app_settings_setting_key_unique" UNIQUE("setting_key")
 );
 --> statement-breakpoint
-CREATE TABLE "discounts" (
+CREATE TABLE "ecom"."discounts" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"code" text NOT NULL,
 	"discount_type" text NOT NULL,
@@ -15,7 +17,7 @@ CREATE TABLE "discounts" (
 	CONSTRAINT "discounts_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-CREATE TABLE "order_items" (
+CREATE TABLE "ecom"."order_items" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"order_id" integer NOT NULL,
 	"product_id" integer NOT NULL,
@@ -23,7 +25,7 @@ CREATE TABLE "order_items" (
 	"price" numeric(10, 2) NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "orders" (
+CREATE TABLE "ecom"."orders" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"total_amount" numeric(10, 2) NOT NULL,
@@ -34,7 +36,7 @@ CREATE TABLE "orders" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "products" (
+CREATE TABLE "ecom"."products" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
@@ -45,7 +47,7 @@ CREATE TABLE "products" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "users" (
+CREATE TABLE "ecom"."users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
 	"password_hash" text,
@@ -56,6 +58,6 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-ALTER TABLE "order_items" ADD CONSTRAINT "order_items_order_id_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."orders"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "order_items" ADD CONSTRAINT "order_items_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "ecom"."order_items" ADD CONSTRAINT "order_items_order_id_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "ecom"."orders"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ecom"."order_items" ADD CONSTRAINT "order_items_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "ecom"."products"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ecom"."orders" ADD CONSTRAINT "orders_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "ecom"."users"("id") ON DELETE no action ON UPDATE no action;
