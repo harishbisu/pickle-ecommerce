@@ -1,12 +1,12 @@
 {
-  "id": "8fb387db-87a3-4813-8187-e03ddda156dd",
+  "id": "bc723c5c-a143-4368-a325-7762bac59307",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "ecom.app_settings": {
+    "public.app_settings": {
       "name": "app_settings",
-      "schema": "ecom",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -43,9 +43,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "ecom.discounts": {
+    "public.discounts": {
       "name": "discounts",
-      "schema": "ecom",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -102,9 +102,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "ecom.order_items": {
+    "public.order_items": {
       "name": "order_items",
-      "schema": "ecom",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -143,7 +143,6 @@
           "name": "order_items_order_id_orders_id_fk",
           "tableFrom": "order_items",
           "tableTo": "orders",
-          "schemaTo": "ecom",
           "columnsFrom": [
             "order_id"
           ],
@@ -157,7 +156,6 @@
           "name": "order_items_product_id_products_id_fk",
           "tableFrom": "order_items",
           "tableTo": "products",
-          "schemaTo": "ecom",
           "columnsFrom": [
             "product_id"
           ],
@@ -174,9 +172,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "ecom.orders": {
+    "public.orders": {
       "name": "orders",
-      "schema": "ecom",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -236,7 +234,6 @@
           "name": "orders_user_id_users_id_fk",
           "tableFrom": "orders",
           "tableTo": "users",
-          "schemaTo": "ecom",
           "columnsFrom": [
             "user_id"
           ],
@@ -253,9 +250,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "ecom.products": {
+    "public.products": {
       "name": "products",
-      "schema": "ecom",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -318,9 +315,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "ecom.users": {
+    "public.users": {
       "name": "users",
-      "schema": "ecom",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -386,9 +383,7 @@
     }
   },
   "enums": {},
-  "schemas": {
-    "ecom": "ecom"
-  },
+  "schemas": {},
   "sequences": {},
   "roles": {},
   "policies": {},

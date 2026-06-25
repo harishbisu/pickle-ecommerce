@@ -3,14 +3,13 @@ import {
   text,
   integer,
   boolean,
-  pgSchema,
+  pgTable,
   timestamp,
   jsonb,
   decimal,
 } from 'drizzle-orm/pg-core';
-export const ecomSchema = pgSchema('ecom');
 
-export const users = ecomSchema.table('users', {
+export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash'),
@@ -20,7 +19,7 @@ export const users = ecomSchema.table('users', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const products = ecomSchema.table('products', {
+export const products = pgTable('products', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   description: text('description').notNull(),
@@ -31,7 +30,7 @@ export const products = ecomSchema.table('products', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const orders = ecomSchema.table('orders', {
+export const orders = pgTable('orders', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .references(() => users.id)
@@ -44,7 +43,7 @@ export const orders = ecomSchema.table('orders', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const orderItems = ecomSchema.table('order_items', {
+export const orderItems = pgTable('order_items', {
   id: serial('id').primaryKey(),
   orderId: integer('order_id')
     .references(() => orders.id)
@@ -56,7 +55,7 @@ export const orderItems = ecomSchema.table('order_items', {
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
 });
 
-export const discounts = ecomSchema.table('discounts', {
+export const discounts = pgTable('discounts', {
   id: serial('id').primaryKey(),
   code: text('code').notNull().unique(),
   discountType: text('discount_type').notNull(), // PERCENTAGE, FIXED
@@ -67,7 +66,7 @@ export const discounts = ecomSchema.table('discounts', {
   active: boolean('active').default(true),
 });
 
-export const appSettings = ecomSchema.table('app_settings', {
+export const appSettings = pgTable('app_settings', {
   id: serial('id').primaryKey(),
   settingKey: text('setting_key').notNull().unique(),
   settingValue: text('setting_value').notNull(),
