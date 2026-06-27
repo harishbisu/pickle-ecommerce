@@ -52,7 +52,7 @@ export function Navbar() {
         >
           <Box h="30px" display="flex" alignItems="center" borderRadius="sm">
             <Image
-              src="/logo.webp"
+              src="/logonav.jpeg"
               alt="Pickle Hub Logo"
               width={{ base: 150, md: 200, lg: 250 }}
               height={"auto"}
