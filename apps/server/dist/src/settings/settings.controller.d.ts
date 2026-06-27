@@ -1,4 +1,5 @@
 import { SettingsService } from './settings.service';
+import { SetSettingDto } from './settings.dto';
 export declare class SettingsController {
     private readonly settingsService;
     constructor(settingsService: SettingsService);
@@ -11,10 +12,7 @@ export declare class SettingsController {
         settingKey: string;
         settingValue: string;
     }[]>;
-    setSetting(body: {
-        key: string;
-        value: string;
-    }): Promise<{
+    setSetting(body: SetSettingDto): Promise<{
         id: number;
         settingKey: string;
         settingValue: string;

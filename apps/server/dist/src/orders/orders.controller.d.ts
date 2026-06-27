@@ -1,17 +1,5 @@
 import { OrdersService } from './orders.service';
-declare class OrderItemDto {
-    productId: number;
-    quantity: number;
-    price: number;
-}
-declare class CheckoutDto {
-    items: OrderItemDto[];
-}
-declare class VerifyPaymentDto {
-    razorpayOrderId: string;
-    razorpayPaymentId: string;
-    razorpaySignature: string;
-}
+import { CheckoutDto, VerifyPaymentDto, UpdateOrderStatusDto } from './orders.dto';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
@@ -31,7 +19,7 @@ export declare class OrdersController {
         success: boolean;
         orderId: number | undefined;
     }>;
-    track(id: string): Promise<{
+    track(id: string, req: any): Promise<{
         items: {
             id: number;
             orderId: number;
@@ -47,10 +35,8 @@ export declare class OrdersController {
         trackingId: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
-    } | null>;
-    updateStatus(id: string, body: {
-        status: string;
-    }): Promise<{
+    }>;
+    updateStatus(id: string, body: UpdateOrderStatusDto): Promise<{
         id: number;
         userId: number;
         totalAmount: string;
@@ -70,5 +56,14 @@ export declare class OrdersController {
         createdAt: Date | null;
         updatedAt: Date | null;
     }[]>;
+    getUserOrders(req: any): Promise<{
+        id: number;
+        userId: number;
+        totalAmount: string;
+        status: string;
+        paymentId: string | null;
+        trackingId: string | null;
+        createdAt: Date | null;
+        updatedAt: Date | null;
+    }[]>;
 }
-export {};

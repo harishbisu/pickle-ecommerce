@@ -1,4 +1,5 @@
 import { ProductsService } from './products.service';
+import { CreateProductDto, UpdateProductDto } from './products.dto';
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
@@ -22,13 +23,7 @@ export declare class ProductsController {
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;
-    create(body: {
-        name: string;
-        description: string;
-        price: number;
-        stock?: number;
-        images?: string[];
-    }): Promise<{
+    create(body: CreateProductDto): Promise<{
         id: number;
         name: string;
         createdAt: Date | null;
@@ -38,13 +33,7 @@ export declare class ProductsController {
         stock: number;
         images: unknown;
     }>;
-    update(id: string, body: {
-        name?: string;
-        description?: string;
-        price?: number;
-        stock?: number;
-        images?: string[];
-    }): Promise<{
+    update(id: string, body: UpdateProductDto): Promise<{
         id: number;
         name: string;
         description: string;

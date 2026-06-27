@@ -57,6 +57,9 @@ const razorpay = new razorpay_1.default({
 });
 let OrdersService = class OrdersService {
     async createOrder(userId, items) {
+        if (!items || items.length === 0) {
+            throw new common_1.BadRequestException('Order must contain at least one item');
+        }
         const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const minOrderSetting = await db_1.db
             .select()
@@ -106,9 +109,26 @@ let OrdersService = class OrdersService {
             .createHmac('sha256', secret)
             .update(body)
             .digest('hex');
-        const isValid = crypto.timingSafeEqual(Buffer.from(expectedSignature, 'hex'), Buffer.from(razorpaySignature, 'hex'));
+        let isValid = false;
+        try {
+            isValid = crypto.timingSafeEqual(Buffer.from(expectedSignature, 'hex'), Buffer.from(razorpaySignature, 'hex'));
+        }
+        catch (err) {
+            return { valid: false };
+        }
         if (!isValid) {
             return { valid: false };
+        }
+        const existingOrder = await db_1.db
+            .select()
+            .from(schema_1.orders)
+            .where((0, drizzle_orm_1.eq)(schema_1.orders.paymentId, razorpayOrderId))
+            .limit(1);
+        if (!existingOrder.length) {
+            return { valid: false };
+        }
+        if (existingOrder[0].status === 'PAID') {
+            return { valid: true, orderId: existingOrder[0].id };
         }
         const orderResult = await db_1.db
             .update(schema_1.orders)
@@ -117,19 +137,34 @@ let OrdersService = class OrdersService {
             .returning();
         return { valid: true, orderId: orderResult[0]?.id };
     }
-    async trackOrder(id) {
-        const order = await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.id, id)).limit(1);
-        if (!order.length)
-            return null;
+    async trackOrder(id, userId) {
+        const order = await db_1.db
+            .select()
+            .from(schema_1.orders)
+            .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.orders.id, id), (0, drizzle_orm_1.eq)(schema_1.orders.userId, userId)))
+            .limit(1);
+        if (!order.length) {
+            throw new common_1.NotFoundException('Order not found');
+        }
         const items = await db_1.db.select().from(schema_1.orderItems).where((0, drizzle_orm_1.eq)(schema_1.orderItems.orderId, id));
         return { ...order[0], items };
     }
     async updateStatus(id, status) {
+        const validStatuses = ['ACKNOWLEDGED', 'PAID', 'DISPATCHED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'];
+        if (!validStatuses.includes(status)) {
+            throw new common_1.BadRequestException(`Invalid status. Allowed statuses: ${validStatuses.join(', ')}`);
+        }
         const result = await db_1.db.update(schema_1.orders).set({ status }).where((0, drizzle_orm_1.eq)(schema_1.orders.id, id)).returning();
+        if (!result.length) {
+            throw new common_1.NotFoundException('Order not found');
+        }
         return result[0];
     }
     async findAll() {
         return await db_1.db.select().from(schema_1.orders);
+    }
+    async findByUserId(userId) {
+        return await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.userId, userId));
     }
 };
 exports.OrdersService = OrdersService;

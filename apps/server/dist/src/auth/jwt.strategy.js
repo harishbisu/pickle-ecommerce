@@ -15,10 +15,14 @@ const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor() {
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+            throw new Error('CRITICAL: JWT_SECRET environment variable is not set. Please configure it before starting the application.');
+        }
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || 'fallback_secret',
+            secretOrKey: jwtSecret,
         });
     }
     async validate(payload) {

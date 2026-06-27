@@ -1,37 +1,11 @@
-import { Controller, Post, Get, Patch, Body, Param, UseGuards, Request, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import {
+  Controller, Post, Get, Patch, Body, Param, UseGuards, Request, HttpCode, HttpStatus, BadRequestException,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { AuthGuard } from '@nestjs/passport';
-import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-
-class OrderItemDto {
-  @IsNumber()
-  productId: number;
-
-  @IsNumber()
-  quantity: number;
-
-  @IsNumber()
-  price: number;
-}
-
-class CheckoutDto {
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => OrderItemDto)
-  items: OrderItemDto[];
-}
-
-class VerifyPaymentDto {
-  @IsString()
-  razorpayOrderId: string;
-
-  @IsString()
-  razorpayPaymentId: string;
-
-  @IsString()
-  razorpaySignature: string;
-}
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { CheckoutDto, VerifyPaymentDto, UpdateOrderStatusDto } from './orders.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -65,19 +39,29 @@ export class OrdersController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('track/:id')
-  async track(@Param('id') id: string) {
-    return this.ordersService.trackOrder(+id);
+  async track(@Param('id') id: string, @Request() req: any) {
+    // Security: Users can only track their own orders
+    return this.ordersService.trackOrder(+id, req.user.id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Patch(':id/status')
-  async updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
+  async updateStatus(@Param('id') id: string, @Body() body: UpdateOrderStatusDto) {
     return this.ordersService.updateStatus(+id, body.status);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Get()
   async findAll() {
     return this.ordersService.findAll();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('user/my-orders')
+  async getUserOrders(@Request() req: any) {
+    // Security: Users can only view their own orders
+    return this.ordersService.findByUserId(req.user.id);
   }
 }

@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.appSettings = exports.discounts = exports.orderItems = exports.orders = exports.products = exports.users = exports.ecomSchema = void 0;
+exports.appSettings = exports.discounts = exports.orderItems = exports.orders = exports.products = exports.users = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
-exports.ecomSchema = (0, pg_core_1.pgSchema)('ecom');
-exports.users = exports.ecomSchema.table('users', {
+exports.users = (0, pg_core_1.pgTable)('users', {
     id: (0, pg_core_1.serial)('id').primaryKey(),
     email: (0, pg_core_1.text)('email').notNull().unique(),
     passwordHash: (0, pg_core_1.text)('password_hash'),
@@ -12,7 +11,7 @@ exports.users = exports.ecomSchema.table('users', {
     createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow(),
     updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow(),
 });
-exports.products = exports.ecomSchema.table('products', {
+exports.products = (0, pg_core_1.pgTable)('products', {
     id: (0, pg_core_1.serial)('id').primaryKey(),
     name: (0, pg_core_1.text)('name').notNull(),
     description: (0, pg_core_1.text)('description').notNull(),
@@ -22,7 +21,7 @@ exports.products = exports.ecomSchema.table('products', {
     createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow(),
     updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow(),
 });
-exports.orders = exports.ecomSchema.table('orders', {
+exports.orders = (0, pg_core_1.pgTable)('orders', {
     id: (0, pg_core_1.serial)('id').primaryKey(),
     userId: (0, pg_core_1.integer)('user_id')
         .references(() => exports.users.id)
@@ -34,7 +33,7 @@ exports.orders = exports.ecomSchema.table('orders', {
     createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow(),
     updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow(),
 });
-exports.orderItems = exports.ecomSchema.table('order_items', {
+exports.orderItems = (0, pg_core_1.pgTable)('order_items', {
     id: (0, pg_core_1.serial)('id').primaryKey(),
     orderId: (0, pg_core_1.integer)('order_id')
         .references(() => exports.orders.id)
@@ -45,7 +44,7 @@ exports.orderItems = exports.ecomSchema.table('order_items', {
     quantity: (0, pg_core_1.integer)('quantity').notNull(),
     price: (0, pg_core_1.decimal)('price', { precision: 10, scale: 2 }).notNull(),
 });
-exports.discounts = exports.ecomSchema.table('discounts', {
+exports.discounts = (0, pg_core_1.pgTable)('discounts', {
     id: (0, pg_core_1.serial)('id').primaryKey(),
     code: (0, pg_core_1.text)('code').notNull().unique(),
     discountType: (0, pg_core_1.text)('discount_type').notNull(),
@@ -53,7 +52,7 @@ exports.discounts = exports.ecomSchema.table('discounts', {
     minCartValue: (0, pg_core_1.decimal)('min_cart_value', { precision: 10, scale: 2 }).default('0'),
     active: (0, pg_core_1.boolean)('active').default(true),
 });
-exports.appSettings = exports.ecomSchema.table('app_settings', {
+exports.appSettings = (0, pg_core_1.pgTable)('app_settings', {
     id: (0, pg_core_1.serial)('id').primaryKey(),
     settingKey: (0, pg_core_1.text)('setting_key').notNull().unique(),
     settingValue: (0, pg_core_1.text)('setting_value').notNull(),

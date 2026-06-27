@@ -15,7 +15,6 @@ import {
   Badge,
   VStack,
   HStack,
-  Icon,
 } from "@chakra-ui/react";
 import {
   ShoppingBag,
@@ -472,21 +471,19 @@ export default function Home() {
           >
             <Flex align="center" gap={2}>
               <Box
-                w="28px"
-                h="28px"
-                borderRadius="6px"
-                bg="brand.500"
+                h="30px"
                 display="flex"
                 alignItems="center"
-                justifyContent="center"
+                borderRadius="sm"
               >
-                <Text color="white" fontWeight="700" fontSize="14px">
-                  P
-                </Text>
+                <Image
+                  src="/logo.webp"
+                  alt="Pickle Hub Logo"
+                  width={{ base: 150, md: 200, lg: 250 }}
+                  height={"auto"}
+                  style={{ objectFit: "contain" }}
+                />
               </Box>
-              <Text fontWeight="600" color="surface.900">
-                Pickle Hub
-              </Text>
             </Flex>
             <Text fontSize="13px" color="surface.500">
               © 2026 Pickle Hub. Authentic, Natural, Delicious.

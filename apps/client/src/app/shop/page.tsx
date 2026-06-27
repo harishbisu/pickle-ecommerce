@@ -21,109 +21,11 @@ import {
   VStack,
   Skeleton,
   useToast,
-  IconButton,
 } from "@chakra-ui/react";
-import { Search, ShoppingBag, Star, SlidersHorizontal, X } from "lucide-react";
+import { Search, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
 import { productsApi, Product } from "../../lib/api";
 import { useCart } from "../../providers/CartContext";
-
-// ─── Fallback products if API is offline ──────────────────────────────────────
-const FALLBACK_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: "Spicy Mango 500gm",
-    description:
-      "Delicious Lohagral Mongos. Specially handpicked fresh mangoes with love and passion.",
-    price: "200.00",
-    stock: 199,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/Traditional_Mango.jpg?format=webp&quality=80&v=1781177208&width=450",
-    ],
-    createdAt: "2026-06-25T12:45:45.572Z",
-  },
-  {
-    id: 2,
-    name: "Nani's special pack | Pack of 8 (75gm)",
-    description: "Tasty, Spicy. Once you eat remember forever.",
-    price: "250.00",
-    stock: 112,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/Nani_s_Pack_2.jpg?format=webp&quality=80&v=1781953727&width=450",
-    ],
-    createdAt: "2026-06-25T12:47:07.045Z",
-  },
-  {
-    id: 3,
-    name: "Gajar Gobhi Shalgam Ka Mix Achar | Vegetable Pickle",
-    description:
-      "Fresh Gajar handpicked from our own farm house. For verfication please visit our youtube channel.",
-    price: "350.00",
-    stock: 221,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/Gajar_Gobhi_Pickle.jpg?format=webp&quality=80&v=1781175989&width=450",
-    ],
-    createdAt: "2026-06-25T12:48:32.873Z",
-  },
-  {
-    id: 4,
-    name: "Green Chilli Pickle | Hari Mirch ka Achar",
-    description:
-      "Chilli's are handpicked from own farm. Check our own yt channel.",
-    price: "225.00",
-    stock: 123,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/1._Product_page_1Kg_Green_Chilli_01.jpg?format=webp&quality=80&v=1758868494&width=450",
-    ],
-    createdAt: "2026-06-25T12:49:28.807Z",
-  },
-  {
-    id: 5,
-    name: "Crushed Lemon Pickle | Nimbu ka Achar",
-    description:
-      "Chilli's are handpicked from own farm. Check our own yt channel.",
-    price: "321.00",
-    stock: 210,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/Crushed_Lemon.jpg?format=webp&quality=80&v=1781175805&width=450",
-    ],
-    createdAt: "2026-06-25T12:50:06.775Z",
-  },
-  {
-    id: 6,
-    name: "Amla Pickle | Amla ka Achar",
-    description: "Crushed Lemon Pickle | Nimbu ka Achar",
-    price: "299.00",
-    stock: 123,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/Amla_Pickle.jpg?format=webp&quality=80&v=1781175477&width=450",
-    ],
-    createdAt: "2026-06-25T12:50:39.599Z",
-  },
-  {
-    id: 7,
-    name: "Pickles trial pack | Pack of 4 (75g each)",
-    description:
-      "Chilli's are handpicked from own farm. Check our own yt channel.",
-    price: "245.00",
-    stock: 123,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/Trial_Pack_1.jpg?format=webp&quality=80&v=1781954174&width=450",
-    ],
-    createdAt: "2026-06-25T12:51:24.151Z",
-  },
-  {
-    id: 8,
-    name: "Punjabi Mango Pickle Masala",
-    description: "Handmade by my dadi. She had 20 years of experience.",
-    price: "124.00",
-    stock: 123,
-    images: [
-      "https://www.farmdidi.com/cdn/shop/files/farmdidi-punjabi-mango-pickle-masala.jpg?format=webp&quality=80&v=1757930025&width=450",
-    ],
-    createdAt: "2026-06-25T12:52:17.337Z",
-  },
-];
 
 const RATINGS = [4.8, 4.6, 4.7, 4.5, 4.9, 4.4];
 const REVIEW_COUNTS = [234, 89, 156, 312, 67, 143];
@@ -367,8 +269,8 @@ export default function ShopPage() {
   useEffect(() => {
     productsApi
       .list()
-      .then((data) => setProducts(data.length > 0 ? data : FALLBACK_PRODUCTS))
-      .catch(() => setProducts(FALLBACK_PRODUCTS))
+      .then((data) => setProducts(data.length > 0 ? data : []))
+      .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, []);
 
@@ -380,12 +282,12 @@ export default function ShopPage() {
       image: product.images?.[0] || "",
     });
     toast({
-      title: "Added to cart! 🛍️",
+      title: "Added to cart!",
       description: product.name,
       status: "success",
       duration: 1800,
       isClosable: true,
-      position: "top-right",
+      position: "bottom-right",
     });
   };
 
@@ -459,7 +361,7 @@ export default function ShopPage() {
                 py={1}
                 mb={3}
               >
-                🥒 Fresh & Natural
+                🥒 Authentic Rajasthan Flavours
               </Badge>
               <Heading
                 color="white"
@@ -468,16 +370,14 @@ export default function ShopPage() {
                 letterSpacing="-0.03em"
                 mb={2}
               >
-                Artisanal Pickles
-                <br />
-                Straight from the Jar
+                Taste the Soul of Rajasthan
               </Heading>
               <Text
                 color="whiteAlpha.800"
                 fontSize={{ base: "14px", md: "16px" }}
                 maxW="400px"
               >
-                Handcrafted with traditional recipes, free delivery above ₹499
+                Crafted with Tradition, free delivery above ₹499
               </Text>
             </Box>
 
@@ -516,7 +416,21 @@ export default function ShopPage() {
 
       <Container maxW="1280px" px={6} py={8}>
         {/* ── Category Chips ─────────────────────────────────────── */}
-        <Box mb={6} overflowX="auto" pb={2}>
+        <Text fontSize="14px" color="surface.500" mb={2}>
+          Browse by category
+        </Text>
+        <Box
+          mb={6}
+          overflowX="auto"
+          pb={2}
+          css={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+          }}
+        >
           <HStack spacing={2} minW="max-content">
             {CATEGORIES.map(({ id, label }) => {
               const isActive = category === id;
@@ -551,39 +465,41 @@ export default function ShopPage() {
         </Box>
 
         {/* ── Filter bar ─────────────────────────────────────── */}
-        <Flex justify="space-between" align="center" mb={6} gap={4} wrap="wrap">
-          <Text fontSize="14px" color="surface.500">
-            {loading ? (
-              "Loading..."
-            ) : (
-              <>
-                <Text as="span" fontWeight="700" color="surface.800">
-                  {filtered.length}
-                </Text>{" "}
-                products
-                {category !== "all" && (
-                  <Text as="span">
-                    {" "}
-                    in{" "}
-                    <Text as="span" fontWeight="600" color="brand.500">
-                      {CATEGORIES.find((c) => c.id === category)?.label}
-                    </Text>
-                  </Text>
-                )}
-                {search && (
-                  <Text as="span">
-                    {" "}
-                    matching "
-                    <Text as="span" fontWeight="600">
-                      {search}
-                    </Text>
-                    "
-                  </Text>
-                )}
-              </>
-            )}
-          </Text>
-          <HStack spacing={3}>
+        <VStack align="stretch" spacing={4} mb={6}>
+          {/* Top Row */}
+          <Flex justify="space-between" align="center" wrap="wrap" gap={3}>
+            <Text fontSize="14px" color="surface.500">
+              {loading ? (
+                "Loading..."
+              ) : (
+                <>
+                  <Text as="span" fontWeight="700" color="surface.800">
+                    {filtered.length}
+                  </Text>{" "}
+                  products
+                  {category !== "all" && (
+                    <>
+                      {" "}
+                      in{" "}
+                      <Text as="span" fontWeight="600" color="brand.500">
+                        {CATEGORIES.find((c) => c.id === category)?.label}
+                      </Text>
+                    </>
+                  )}
+                  {search && (
+                    <>
+                      {" "}
+                      matching "
+                      <Text as="span" fontWeight="600">
+                        {search}
+                      </Text>
+                      "
+                    </>
+                  )}
+                </>
+              )}
+            </Text>
+
             {(search || category !== "all") && (
               <Button
                 size="sm"
@@ -600,9 +516,25 @@ export default function ShopPage() {
                 Clear filters
               </Button>
             )}
-            <HStack spacing={2}>
-              <SlidersHorizontal size={15} color="#5f6368" />
-              <HStack spacing={1} wrap={"wrap"}>
+          </Flex>
+
+          {/* Scrollable Sort Chips */}
+          <Box display="flex" gap={3} alignItems="center">
+            <SlidersHorizontal size={22} color="#5f6368" />
+            <Box
+              overflowX="auto"
+              overflowY="hidden"
+              whiteSpace="nowrap"
+              css={{
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+                WebkitOverflowScrolling: "touch",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+              }}
+            >
+              <HStack spacing={2} display="inline-flex" py={1}>
                 {SORT_OPTIONS.map((opt) => (
                   <Button
                     key={opt.value}
@@ -623,14 +555,15 @@ export default function ShopPage() {
                     }}
                     onClick={() => setSort(opt.value)}
                     transition="all 0.15s"
+                    flexShrink={0}
                   >
                     {opt.label}
                   </Button>
                 ))}
               </HStack>
-            </HStack>
-          </HStack>
-        </Flex>
+            </Box>
+          </Box>
+        </VStack>
 
         {/* ── Product Grid ─────────────────────────────────────────── */}
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={5}>

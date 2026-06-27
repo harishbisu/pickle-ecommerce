@@ -1,19 +1,38 @@
-'use client';
+"use client";
 
 import {
-  Box, Container, Heading, Text, Button, VStack, HStack, Flex,
-  Image, Divider, IconButton, Badge, Card, CardBody, Input,
-  InputGroup, InputLeftAddon, useToast,
-} from '@chakra-ui/react';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag } from 'lucide-react';
-import NextLink from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Navbar } from '../../components/Navbar';
-import { useCart } from '../../providers/CartContext';
-import { useAuth } from '../../providers/AuthContext';
+  Box,
+  Container,
+  Heading,
+  Text,
+  Button,
+  VStack,
+  HStack,
+  Flex,
+  Image,
+  Divider,
+  IconButton,
+  Badge,
+  Card,
+  CardBody,
+  useToast,
+} from "@chakra-ui/react";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag } from "lucide-react";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+import { Navbar } from "../../components/Navbar";
+import { useCart } from "../../providers/CartContext";
+import { useAuth } from "../../providers/AuthContext";
 
 export default function CartPage() {
-  const { items, totalAmount, totalItems, updateQuantity, removeItem, clearCart } = useCart();
+  const {
+    items,
+    totalAmount,
+    totalItems,
+    updateQuantity,
+    removeItem,
+    clearCart,
+  } = useCart();
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -24,16 +43,16 @@ export default function CartPage() {
   const handleCheckout = () => {
     if (!isAuthenticated) {
       toast({
-        title: 'Please sign in',
-        description: 'You need to be signed in to checkout',
-        status: 'warning',
+        title: "Please sign in",
+        description: "You need to be signed in to checkout",
+        status: "warning",
         duration: 3000,
-        position: 'top-right',
+        position: "top-right",
       });
-      router.push('/login');
+      router.push("/login");
       return;
     }
-    router.push('/checkout');
+    router.push("/checkout");
   };
 
   if (items.length === 0) {
@@ -42,8 +61,12 @@ export default function CartPage() {
         <Navbar />
         <Container maxW="600px" px={6} py={20}>
           <VStack spacing={6} textAlign="center" className="fade-in">
-            <Text fontSize="80px" lineHeight={1}>🛒</Text>
-            <Heading size="lg" color="surface.900">Your cart is empty</Heading>
+            <Text fontSize="80px" lineHeight={1}>
+              🛒
+            </Text>
+            <Heading size="lg" color="surface.900">
+              Your cart is empty
+            </Heading>
             <Text color="surface.500" fontSize="15px">
               Looks like you haven't added any pickles yet!
             </Text>
@@ -76,30 +99,40 @@ export default function CartPage() {
             onClick={() => router.back()}
           />
           <Box>
-            <Heading size="lg" color="surface.900">Your Cart</Heading>
-            <Text color="surface.500" fontSize="14px">{totalItems} item{totalItems !== 1 ? 's' : ''}</Text>
+            <Heading size="lg" color="surface.900">
+              Your Cart
+            </Heading>
+            <Text color="surface.500" fontSize="14px">
+              {totalItems} item{totalItems !== 1 ? "s" : ""}
+            </Text>
           </Box>
         </Flex>
 
-        <Flex gap={8} direction={{ base: 'column', lg: 'row' }}>
+        <Flex gap={8} direction={{ base: "column", lg: "row" }}>
           {/* Cart Items */}
           <Box flex={1}>
             <VStack spacing={4} align="stretch">
-              {items.map(item => (
-                <Card key={item.productId}>
+              {items.map((item) => (
+                <Card key={item.productId} borderRadius="xl">
                   <CardBody p={4}>
                     <Flex gap={4} align="start">
                       <Image
-                        src={item.image || 'https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=200'}
+                        src={
+                          item.image ||
+                          "https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=200"
+                        }
                         alt={item.name}
-                        w="80px" h="80px"
+                        w="80px"
+                        h="80px"
                         objectFit="cover"
                         borderRadius="10px"
                         flexShrink={0}
                       />
                       <Box flex={1} minW={0}>
                         <Flex justify="space-between" align="start" gap={2}>
-                          <Heading size="sm" color="surface.900" noOfLines={2}>{item.name}</Heading>
+                          <Heading size="sm" color="surface.900" noOfLines={2}>
+                            {item.name}
+                          </Heading>
                           <IconButton
                             aria-label="Remove"
                             icon={<Trash2 size={16} />}
@@ -111,7 +144,9 @@ export default function CartPage() {
                             flexShrink={0}
                           />
                         </Flex>
-                        <Text color="surface.500" fontSize="13px" mt={1}>₹{item.price} per unit</Text>
+                        <Text color="surface.500" fontSize="13px" mt={1}>
+                          ₹{item.price} per unit
+                        </Text>
                         <Flex align="center" justify="space-between" mt={3}>
                           {/* Quantity Control */}
                           <HStack
@@ -127,11 +162,21 @@ export default function CartPage() {
                               size="sm"
                               variant="ghost"
                               borderRadius={0}
-                              onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                              onClick={() =>
+                                updateQuantity(
+                                  item.productId,
+                                  item.quantity - 1,
+                                )
+                              }
                             />
                             <Text
-                              px={4} py={1} fontSize="14px" fontWeight="600"
-                              color="surface.900" minW="36px" textAlign="center"
+                              px={4}
+                              py={1}
+                              fontSize="14px"
+                              fontWeight="600"
+                              color="surface.900"
+                              minW="36px"
+                              textAlign="center"
                             >
                               {item.quantity}
                             </Text>
@@ -141,7 +186,12 @@ export default function CartPage() {
                               size="sm"
                               variant="ghost"
                               borderRadius={0}
-                              onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                              onClick={() =>
+                                updateQuantity(
+                                  item.productId,
+                                  item.quantity + 1,
+                                )
+                              }
                             />
                           </HStack>
                           <Text fontWeight="700" color="surface.900">
@@ -168,20 +218,34 @@ export default function CartPage() {
           </Box>
 
           {/* Order Summary */}
-          <Box w={{ base: 'full', lg: '340px' }} flexShrink={0}>
-            <Card position="sticky" top="80px">
+          <Box w={{ base: "full", lg: "340px" }} flexShrink={0}>
+            <Card position="sticky" top="80px" borderRadius="xl">
               <CardBody p={6}>
-                <Heading size="md" mb={5} color="surface.900">Order Summary</Heading>
+                <Heading size="md" mb={5} color="surface.900">
+                  Order Summary
+                </Heading>
 
                 <VStack spacing={3} align="stretch" mb={4}>
                   <Flex justify="space-between">
-                    <Text fontSize="14px" color="surface.600">Subtotal ({totalItems} items)</Text>
-                    <Text fontSize="14px" fontWeight="600">₹{totalAmount.toFixed(0)}</Text>
+                    <Text fontSize="14px" color="surface.600">
+                      Subtotal ({totalItems} items)
+                    </Text>
+                    <Text fontSize="14px" fontWeight="600">
+                      ₹{totalAmount.toFixed(0)}
+                    </Text>
                   </Flex>
                   <Flex justify="space-between">
-                    <Text fontSize="14px" color="surface.600">Delivery</Text>
-                    <Text fontSize="14px" fontWeight="600" color={deliveryCharge === 0 ? 'google.green' : 'surface.900'}>
-                      {deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`}
+                    <Text fontSize="14px" color="surface.600">
+                      Delivery
+                    </Text>
+                    <Text
+                      fontSize="14px"
+                      fontWeight="600"
+                      color={
+                        deliveryCharge === 0 ? "google.green" : "surface.900"
+                      }
+                    >
+                      {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
                     </Text>
                   </Flex>
                   {deliveryCharge > 0 && (
@@ -194,8 +258,12 @@ export default function CartPage() {
                 <Divider mb={4} />
 
                 <Flex justify="space-between" mb={6}>
-                  <Text fontWeight="700" color="surface.900">Total</Text>
-                  <Text fontWeight="700" fontSize="xl" color="surface.900">₹{grandTotal.toFixed(0)}</Text>
+                  <Text fontWeight="700" color="surface.900">
+                    Total
+                  </Text>
+                  <Text fontWeight="700" fontSize="xl" color="surface.900">
+                    ₹{grandTotal.toFixed(0)}
+                  </Text>
                 </Flex>
 
                 <Button

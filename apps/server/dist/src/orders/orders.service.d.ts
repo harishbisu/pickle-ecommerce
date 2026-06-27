@@ -19,7 +19,7 @@ export declare class OrdersService {
         valid: boolean;
         orderId?: number;
     }>;
-    trackOrder(id: number): Promise<{
+    trackOrder(id: number, userId: number): Promise<{
         items: {
             id: number;
             orderId: number;
@@ -35,7 +35,7 @@ export declare class OrdersService {
         trackingId: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
-    } | null>;
+    }>;
     updateStatus(id: number, status: string): Promise<{
         id: number;
         userId: number;
@@ -47,6 +47,16 @@ export declare class OrdersService {
         updatedAt: Date | null;
     }>;
     findAll(): Promise<{
+        id: number;
+        userId: number;
+        totalAmount: string;
+        status: string;
+        paymentId: string | null;
+        trackingId: string | null;
+        createdAt: Date | null;
+        updatedAt: Date | null;
+    }[]>;
+    findByUserId(userId: number): Promise<{
         id: number;
         userId: number;
         totalAmount: string;

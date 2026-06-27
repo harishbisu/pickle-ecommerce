@@ -13,6 +13,8 @@ exports.AnalyticsController = void 0;
 const common_1 = require("@nestjs/common");
 const analytics_service_1 = require("./analytics.service");
 const passport_1 = require("@nestjs/passport");
+const roles_guard_1 = require("../auth/roles.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let AnalyticsController = class AnalyticsController {
     analyticsService;
     constructor(analyticsService) {
@@ -24,7 +26,8 @@ let AnalyticsController = class AnalyticsController {
 };
 exports.AnalyticsController = AnalyticsController;
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
     (0, common_1.Get)('dashboard'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),

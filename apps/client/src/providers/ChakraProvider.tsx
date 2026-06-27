@@ -3,95 +3,77 @@
 import { ChakraProvider as Provider, extendTheme } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 
-// Google Material 3 inspired theme
+// Flipkart inspired theme
 const theme = extendTheme({
   fonts: {
-    heading: `'Inter', 'Google Sans', sans-serif`,
-    body: `'Inter', 'Google Sans', sans-serif`,
+    heading: `'Roboto', 'Inter', sans-serif`,
+    body: `'Roboto', 'Inter', sans-serif`,
   },
   colors: {
     brand: {
-      50: '#e8f0fe',
-      100: '#d2e3fc',
-      200: '#aecbfa',
-      300: '#7baaf7',
-      400: '#4285f4',
-      500: '#1a73e8',
-      600: '#1557b0',
-      700: '#0d47a1',
-      800: '#0a3880',
-      900: '#062460',
+      50: '#eef4ff',
+      100: '#dce8ff',
+      200: '#b9d1ff',
+      300: '#96bbff',
+      400: '#73a4ff',
+      500: '#2874f0', // Flipkart Blue
+      600: '#1d5ec9',
+      700: '#14469e',
+      800: '#0b2f73',
+      900: '#041747',
     },
-    google: {
-      blue: '#1a73e8',
-      red: '#ea4335',
-      green: '#34a853',
-      yellow: '#fbbc05',
-      grey: '#5f6368',
-      lightBlue: '#e8f0fe',
-      lightGreen: '#e6f4ea',
-      lightRed: '#fce8e6',
-      lightYellow: '#fef7e0',
+    accent: {
+      500: '#fb641b', // Flipkart Orange
+      600: '#e05a18',
     },
     surface: {
-      50: '#f8f9fa',
-      100: '#f1f3f4',
-      200: '#e8eaed',
-      300: '#dadce0',
-      400: '#bdc1c6',
-      500: '#9aa0a6',
-      600: '#80868b',
-      700: '#5f6368',
-      800: '#3c4043',
-      900: '#202124',
+      50: '#f1f3f6', // Flipkart background gray
+      100: '#e0e0e0',
+      200: '#cccccc',
+      300: '#b3b3b3',
+      400: '#999999',
+      500: '#808080',
+      600: '#666666',
+      700: '#4d4d4d',
+      800: '#333333',
+      900: '#212121', // Dark text
     }
   },
   components: {
     Button: {
       baseStyle: {
-        fontWeight: '500',
-        borderRadius: '24px',
+        fontWeight: '600',
+        borderRadius: '2px', // Flipkart uses very slightly rounded or square buttons
         fontSize: '14px',
-        letterSpacing: '0.01em',
-        transition: 'all 0.15s ease',
+        textTransform: 'uppercase',
       },
       variants: {
         solid: {
-          bg: 'brand.500',
+          bg: 'accent.500',
           color: 'white',
-          boxShadow: '0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+          boxShadow: '0 1px 2px 0 rgba(0,0,0,.2)',
           _hover: {
-            bg: 'brand.600',
-            boxShadow: '0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15)',
-            transform: 'translateY(-1px)',
+            bg: 'accent.600',
+            boxShadow: '0 2px 4px 0 rgba(0,0,0,.2)',
           },
-          _active: { transform: 'translateY(0)', boxShadow: 'none' },
+          _active: { bg: 'accent.600' },
         },
         outline: {
           border: '1px solid',
           borderColor: 'surface.300',
-          color: 'brand.500',
+          color: 'surface.800',
           bg: 'white',
           _hover: {
-            bg: 'brand.50',
-            borderColor: 'brand.500',
+            bg: 'surface.50',
           },
         },
         ghost: {
           color: 'surface.700',
-          borderRadius: '8px',
           _hover: { bg: 'surface.100', color: 'surface.900' },
-        },
-        'google-text': {
-          color: 'brand.500',
-          bg: 'transparent',
-          borderRadius: '8px',
-          fontWeight: '500',
-          _hover: { bg: 'brand.50' },
         },
       },
       defaultProps: {
-        colorScheme: 'brand',
+        colorScheme: 'accent',
         variant: 'solid',
       },
     },
@@ -99,13 +81,12 @@ const theme = extendTheme({
       baseStyle: {
         container: {
           bg: 'white',
-          borderRadius: '12px',
-          border: '1px solid',
-          borderColor: 'surface.300',
-          boxShadow: '0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
-          transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+          borderRadius: '2px',
+          border: 'none',
+          boxShadow: '0 1px 2px 0 rgba(0,0,0,.15)',
+          transition: 'box-shadow 0.2s ease',
           _hover: {
-            boxShadow: '0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15)',
+            boxShadow: '0 4px 8px 0 rgba(0,0,0,.15)',
           },
         },
       },
@@ -114,14 +95,14 @@ const theme = extendTheme({
       variants: {
         outline: {
           field: {
-            borderRadius: '8px',
+            borderRadius: '2px',
             borderColor: 'surface.300',
             bg: 'white',
             fontSize: '14px',
             _hover: { borderColor: 'brand.500' },
             _focus: {
               borderColor: 'brand.500',
-              boxShadow: '0 0 0 2px rgba(26, 115, 232, 0.2)',
+              boxShadow: 'none',
             },
           },
         },
@@ -130,18 +111,11 @@ const theme = extendTheme({
     },
     Badge: {
       baseStyle: {
-        borderRadius: '12px',
+        borderRadius: '2px',
         fontSize: '11px',
         fontWeight: '600',
-        letterSpacing: '0.02em',
-        textTransform: 'uppercase',
         px: 2,
         py: 0.5,
-      },
-    },
-    Heading: {
-      baseStyle: {
-        letterSpacing: '-0.02em',
       },
     },
   },
@@ -152,20 +126,6 @@ const theme = extendTheme({
         color: 'surface.900',
       },
     },
-  },
-  shadows: {
-    sm: '0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
-    md: '0 1px 2px rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15)',
-    lg: '0 1px 3px rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)',
-    xl: '0 2px 3px rgba(60,64,67,0.3), 0 6px 10px 4px rgba(60,64,67,0.15)',
-  },
-  radii: {
-    sm: '4px',
-    md: '8px',
-    lg: '12px',
-    xl: '16px',
-    '2xl': '24px',
-    full: '9999px',
   },
 });
 

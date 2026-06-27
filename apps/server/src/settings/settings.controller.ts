@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { SetSettingDto } from './settings.dto';
 
 @Controller('settings')
 export class SettingsController {
@@ -14,16 +17,18 @@ export class SettingsController {
   }
 
   /** Admin endpoint — get ALL settings as an array */
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Get()
   async getAll() {
     return this.settingsService.getAll();
   }
 
   /** Admin endpoint — upsert a setting */
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @Post()
-  async setSetting(@Body() body: { key: string; value: string }) {
+  async setSetting(@Body() body: SetSettingDto) {
     return this.settingsService.setSetting(body.key, body.value);
   }
 }

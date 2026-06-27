@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { db } from '../db';
 import { orders, orderItems, appSettings } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import Razorpay from 'razorpay';
 import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
@@ -16,6 +16,11 @@ const razorpay = new Razorpay({
 @Injectable()
 export class OrdersService {
   async createOrder(userId: number, items: { productId: number; quantity: number; price: number }[]) {
+    // Validate items
+    if (!items || items.length === 0) {
+      throw new BadRequestException('Order must contain at least one item');
+    }
+
     // Calculate total amount
     const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -72,6 +77,9 @@ export class OrdersService {
    * Razorpay signs the payment using: HMAC_SHA256(razorpay_order_id + "|" + razorpay_payment_id, secret)
    * We verify this signature server-side before marking any order as PAID.
    * This prevents fraudulent payment confirmations from the client.
+   *
+   * IDEMPOTENCY: If the same payment is verified multiple times, we return the existing order
+   * without creating duplicate charges. This prevents issues if the client retries verification.
    */
   async verifyPayment(
     razorpayOrderId: string,
@@ -91,16 +99,38 @@ export class OrdersService {
       .digest('hex');
 
     // Constant-time comparison to prevent timing attacks
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(expectedSignature, 'hex'),
-      Buffer.from(razorpaySignature, 'hex'),
-    );
+    let isValid = false;
+    try {
+      isValid = crypto.timingSafeEqual(
+        Buffer.from(expectedSignature, 'hex'),
+        Buffer.from(razorpaySignature, 'hex'),
+      );
+    } catch (err) {
+      // timingSafeEqual throws if buffer lengths don't match
+      return { valid: false };
+    }
 
     if (!isValid) {
       return { valid: false };
     }
 
-    // Find the order by Razorpay order ID and mark as PAID
+    // Check if order already exists with this Razorpay order ID
+    const existingOrder = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.paymentId, razorpayOrderId))
+      .limit(1);
+
+    if (!existingOrder.length) {
+      return { valid: false };
+    }
+
+    // If order is already PAID, return idempotently (prevent duplicate processing)
+    if (existingOrder[0].status === 'PAID') {
+      return { valid: true, orderId: existingOrder[0].id };
+    }
+
+    // Mark order as PAID
     const orderResult = await db
       .update(orders)
       .set({ status: 'PAID', paymentId: razorpayPaymentId })
@@ -110,19 +140,41 @@ export class OrdersService {
     return { valid: true, orderId: orderResult[0]?.id };
   }
 
-  async trackOrder(id: number) {
-    const order = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-    if (!order.length) return null;
+  async trackOrder(id: number, userId: number) {
+    // Security: Ensure user can only track their own orders
+    const order = await db
+      .select()
+      .from(orders)
+      .where(and(eq(orders.id, id), eq(orders.userId, userId)))
+      .limit(1);
+
+    if (!order.length) {
+      throw new NotFoundException('Order not found');
+    }
+
     const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
     return { ...order[0], items };
   }
 
   async updateStatus(id: number, status: string) {
+    // Validate status
+    const validStatuses = ['ACKNOWLEDGED', 'PAID', 'DISPATCHED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'];
+    if (!validStatuses.includes(status)) {
+      throw new BadRequestException(`Invalid status. Allowed statuses: ${validStatuses.join(', ')}`);
+    }
+
     const result = await db.update(orders).set({ status }).where(eq(orders.id, id)).returning();
+    if (!result.length) {
+      throw new NotFoundException('Order not found');
+    }
     return result[0];
   }
 
   async findAll() {
     return await db.select().from(orders);
+  }
+
+  async findByUserId(userId: number) {
+    return await db.select().from(orders).where(eq(orders.userId, userId));
   }
 }
