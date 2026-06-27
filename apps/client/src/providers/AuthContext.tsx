@@ -1,13 +1,8 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { authApi } from '../lib/api';
-
-interface User {
-  id: number;
-  email: string;
-  role: string;
-}
+import { authService } from '../services/auth.service';
+import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -28,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem('pickle_token');
     if (token) {
-      authApi
+      authService
         .profile()
         .then(setUser)
         .catch(() => {
@@ -41,14 +36,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const { access_token } = await authApi.login(email, password);
+    const { access_token } = await authService.login(email, password);
     localStorage.setItem('pickle_token', access_token);
-    const profile = await authApi.profile();
+    const profile = await authService.profile();
     setUser(profile);
   }, []);
 
   const register = useCallback(async (email: string, password: string) => {
-    await authApi.register(email, password);
+    await authService.register(email, password);
     // Auto-login after register
     await login(email, password);
   }, [login]);

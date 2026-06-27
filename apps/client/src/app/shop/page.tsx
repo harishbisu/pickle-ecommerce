@@ -89,9 +89,10 @@ function ProductCard({
       transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
       className="fade-in"
       cursor="pointer"
+      borderRadius="xl"
     >
       {/* Image */}
-      <Box position="relative" overflow="hidden" h="200px" bg="surface.50">
+      <Box position="relative" overflow="hidden" h="300px" bg="surface.50">
         <Image
           src={
             product.images?.[0] ||
@@ -114,7 +115,7 @@ function ProductCard({
           position="absolute"
           top={2.5}
           left={2.5}
-          bg="google.red"
+          bg="red.500"
           color="white"
           borderRadius="full"
           fontSize="10px"
@@ -163,7 +164,7 @@ function ProductCard({
       </Box>
 
       <CardBody p={4}>
-        <Stack spacing={3}>
+        <Stack spacing={3} justify="space-between" h="full">
           {/* Name & Description */}
           <Box>
             <Heading size="sm" color="surface.900" noOfLines={1} mb={1}>
@@ -178,78 +179,81 @@ function ProductCard({
               {product.description}
             </Text>
           </Box>
-
-          {/* Rating */}
-          <HStack spacing={1.5}>
-            <HStack spacing={0.5}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Text
-                  key={star}
-                  fontSize="11px"
-                  color={
-                    star <= Math.round(rating) ? "google.yellow" : "surface.300"
-                  }
-                >
-                  ★
-                </Text>
-              ))}
-            </HStack>
-            <Text fontSize="12px" fontWeight="600" color="surface.700">
-              {rating}
-            </Text>
-            <Text fontSize="11px" color="surface.400">
-              ({reviews})
-            </Text>
-          </HStack>
-
-          {/* Price Row */}
-          <Flex align="center" justify="space-between">
-            <Box>
-              <HStack spacing={1.5} align="baseline">
-                <Text fontWeight="800" fontSize="18px" color="surface.900">
-                  ₹{product.price}
-                </Text>
-                <Text
-                  fontWeight="400"
-                  fontSize="12px"
-                  color="surface.400"
-                  textDecoration="line-through"
-                >
-                  ₹{Math.round(parseFloat(product.price) * 1.25)}
-                </Text>
+          <VStack align="stretch">
+            {/* Rating */}
+            <HStack spacing={1.5}>
+              <HStack spacing={0.5}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Text
+                    key={star}
+                    fontSize="11px"
+                    color={
+                      star <= Math.round(rating)
+                        ? "google.yellow"
+                        : "surface.300"
+                    }
+                  >
+                    ★
+                  </Text>
+                ))}
               </HStack>
-              <Text fontSize="10px" color="google.green" fontWeight="600">
-                Free delivery
+              <Text fontSize="12px" fontWeight="600" color="surface.700">
+                {rating}
               </Text>
-            </Box>
-            <Box
-              w="10px"
-              h="10px"
-              borderRadius="full"
-              bg={product.stock > 0 ? "google.green" : "google.red"}
-            />
-          </Flex>
+              <Text fontSize="11px" color="surface.400">
+                ({reviews})
+              </Text>
+            </HStack>
 
-          {/* CTA Button */}
-          <Button
-            id={`add-cart-${product.id}`}
-            size="sm"
-            w="full"
-            borderRadius="10px"
-            leftIcon={<ShoppingBag size={14} />}
-            isDisabled={product.stock === 0}
-            onClick={handleAdd}
-            isLoading={adding}
-            loadingText="Adding..."
-            h="38px"
-            fontSize="13px"
-            fontWeight="600"
-            _hover={{ transform: "translateY(-1px)", boxShadow: "md" }}
-            _active={{ transform: "translateY(0)" }}
-            transition="all 0.15s ease"
-          >
-            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
-          </Button>
+            {/* Price Row */}
+            <Flex align="center" justify="space-between">
+              <Box>
+                <HStack spacing={1.5} align="baseline">
+                  <Text fontWeight="800" fontSize="18px" color="surface.900">
+                    ₹{product.price}
+                  </Text>
+                  <Text
+                    fontWeight="400"
+                    fontSize="12px"
+                    color="surface.400"
+                    textDecoration="line-through"
+                  >
+                    ₹{Math.round(parseFloat(product.price) * 1.25)}
+                  </Text>
+                </HStack>
+                <Text fontSize="10px" color="google.green" fontWeight="600">
+                  Free delivery
+                </Text>
+              </Box>
+              <Box
+                w="10px"
+                h="10px"
+                borderRadius="full"
+                bg={product.stock > 0 ? "google.green" : "google.red"}
+              />
+            </Flex>
+
+            {/* CTA Button */}
+            <Button
+              id={`add-cart-${product.id}`}
+              size="sm"
+              w="full"
+              borderRadius="10px"
+              leftIcon={<ShoppingBag size={14} />}
+              isDisabled={product.stock === 0}
+              onClick={handleAdd}
+              isLoading={adding}
+              loadingText="Adding..."
+              h="38px"
+              fontSize="13px"
+              fontWeight="600"
+              _hover={{ transform: "translateY(-1px)", boxShadow: "md" }}
+              _active={{ transform: "translateY(0)" }}
+              transition="all 0.15s ease"
+            >
+              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+            </Button>
+          </VStack>
         </Stack>
       </CardBody>
     </Card>
@@ -420,7 +424,7 @@ export default function ShopPage() {
           Browse by category
         </Text>
         <Box
-          mb={6}
+          mb={{ base: 2, md: 6 }}
           overflowX="auto"
           pb={2}
           css={{
@@ -465,7 +469,7 @@ export default function ShopPage() {
         </Box>
 
         {/* ── Filter bar ─────────────────────────────────────── */}
-        <VStack align="stretch" spacing={4} mb={6}>
+        <VStack align="stretch" spacing={4} mb={{ base: 2, md: 6 }}>
           {/* Top Row */}
           <Flex justify="space-between" align="center" wrap="wrap" gap={3}>
             <Text fontSize="14px" color="surface.500">
@@ -578,7 +582,7 @@ export default function ShopPage() {
                   borderColor="surface.200"
                   boxShadow="sm"
                 >
-                  <Skeleton height="200px" />
+                  <Skeleton height="300px" />
                   <Box p={4}>
                     <Skeleton height="16px" mb={2} borderRadius="6px" />
                     <Skeleton height="12px" mb={1} borderRadius="6px" />

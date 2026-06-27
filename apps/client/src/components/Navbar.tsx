@@ -70,7 +70,7 @@ export function Navbar() {
               href="/login"
               bg="white"
               color="#2874f0"
-              px={10}
+              px={{ base: 4, md: 6, lg: 8, xl: 10 }}
               h="32px"
               borderRadius="sm"
               fontSize="14px"

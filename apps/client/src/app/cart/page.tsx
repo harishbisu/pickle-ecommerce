@@ -17,7 +17,7 @@ import {
   CardBody,
   useToast,
 } from "@chakra-ui/react";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag, ShoppingCart } from "lucide-react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { Navbar } from "../../components/Navbar";
@@ -61,9 +61,7 @@ export default function CartPage() {
         <Navbar />
         <Container maxW="600px" px={6} py={20}>
           <VStack spacing={6} textAlign="center" className="fade-in">
-            <Text fontSize="80px" lineHeight={1}>
-              🛒
-            </Text>
+            <ShoppingCart size={64} color="#697481" />
             <Heading size="lg" color="surface.900">
               Your cart is empty
             </Heading>
