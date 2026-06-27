@@ -1,15 +1,15 @@
 export declare class OrdersService {
-    createOrder(userId: number, items: {
-        productId: number;
+    createOrder(userId: string, items: {
+        productId: string;
         quantity: number;
-        price: number;
     }[]): Promise<{
         razorpayOrderId: string;
         razorpayKeyId: string | undefined;
-        id: number;
+        id: string;
         createdAt: Date | null;
         updatedAt: Date | null;
-        userId: number;
+        orderNumber: string;
+        userId: string;
         totalAmount: string;
         status: string;
         paymentId: string | null;
@@ -17,18 +17,35 @@ export declare class OrdersService {
     }>;
     verifyPayment(razorpayOrderId: string, razorpayPaymentId: string, razorpaySignature: string): Promise<{
         valid: boolean;
-        orderId?: number;
+        orderId?: string;
     }>;
-    trackOrder(id: number, userId: number): Promise<{
+    trackOrder(orderNumber: string, userId?: string): Promise<{
+        orderNumber: string;
+        status: string;
+        message: string;
+    } | {
         items: {
-            id: number;
-            orderId: number;
-            productId: number;
+            id: string;
+            orderId: string;
+            productId: string;
             quantity: number;
             price: string;
         }[];
-        id: number;
-        userId: number;
+        id: string;
+        orderNumber: string;
+        userId: string;
+        totalAmount: string;
+        status: string;
+        paymentId: string | null;
+        trackingId: string | null;
+        createdAt: Date | null;
+        updatedAt: Date | null;
+        message?: undefined;
+    }>;
+    updateStatus(id: string, status: string): Promise<{
+        id: string;
+        orderNumber: string;
+        userId: string;
         totalAmount: string;
         status: string;
         paymentId: string | null;
@@ -36,29 +53,11 @@ export declare class OrdersService {
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;
-    updateStatus(id: number, status: string): Promise<{
-        id: number;
-        userId: number;
-        totalAmount: string;
-        status: string;
-        paymentId: string | null;
-        trackingId: string | null;
-        createdAt: Date | null;
-        updatedAt: Date | null;
-    }>;
-    findAll(): Promise<{
-        id: number;
-        userId: number;
-        totalAmount: string;
-        status: string;
-        paymentId: string | null;
-        trackingId: string | null;
-        createdAt: Date | null;
-        updatedAt: Date | null;
-    }[]>;
-    findByUserId(userId: number): Promise<{
-        id: number;
-        userId: number;
+    findAll(statusFilter?: string, dateFilter?: string): Promise<any>;
+    findByUserId(userId: string): Promise<{
+        id: string;
+        orderNumber: string;
+        userId: string;
         totalAmount: string;
         status: string;
         paymentId: string | null;

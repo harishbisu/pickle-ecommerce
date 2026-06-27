@@ -13,16 +13,24 @@ exports.UpdateProductDto = exports.CreateProductDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateProductDto {
     name;
+    slug;
     description;
     price;
     stock;
     images;
+    specifications;
+    isFeatured;
+    discount;
 }
 exports.CreateProductDto = CreateProductDto;
 __decorate([
     (0, class_validator_1.IsString)({ message: 'Product name must be a string' }),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Product slug must be a string' }),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "slug", void 0);
 __decorate([
     (0, class_validator_1.IsString)({ message: 'Product description must be a string' }),
     __metadata("design:type", String)
@@ -44,12 +52,30 @@ __decorate([
     (0, class_validator_1.IsUrl)({}, { each: true, message: 'Each image must be a valid URL' }),
     __metadata("design:type", Array)
 ], CreateProductDto.prototype, "images", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateProductDto.prototype, "specifications", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateProductDto.prototype, "isFeatured", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)({}, { message: 'Discount must be a number' }),
+    (0, class_validator_1.Min)(0, { message: 'Discount must be greater than or equal to 0' }),
+    __metadata("design:type", Number)
+], CreateProductDto.prototype, "discount", void 0);
 class UpdateProductDto {
     name;
+    slug;
     description;
     price;
     stock;
     images;
+    specifications;
+    isFeatured;
+    discount;
 }
 exports.UpdateProductDto = UpdateProductDto;
 __decorate([
@@ -57,6 +83,11 @@ __decorate([
     (0, class_validator_1.IsString)({ message: 'Product name must be a string' }),
     __metadata("design:type", String)
 ], UpdateProductDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Product slug must be a string' }),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "slug", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)({ message: 'Product description must be a string' }),
@@ -80,4 +111,18 @@ __decorate([
     (0, class_validator_1.IsUrl)({}, { each: true, message: 'Each image must be a valid URL' }),
     __metadata("design:type", Array)
 ], UpdateProductDto.prototype, "images", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], UpdateProductDto.prototype, "specifications", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], UpdateProductDto.prototype, "isFeatured", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)({}, { message: 'Discount must be a number' }),
+    (0, class_validator_1.Min)(0, { message: 'Discount must be greater than or equal to 0' }),
+    __metadata("design:type", Number)
+], UpdateProductDto.prototype, "discount", void 0);
 //# sourceMappingURL=products.dto.js.map

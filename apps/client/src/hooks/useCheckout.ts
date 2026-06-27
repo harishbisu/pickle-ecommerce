@@ -17,15 +17,25 @@ export function useCheckout() {
 
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState<{ orderId: number } | null>(null);
+  const [orderSuccess, setOrderSuccess] = useState<{ orderId: string } | null>(null);
   const [address, setAddress] = useState({ name: '', phone: '', street: '', city: '', pincode: '' });
+
+  useEffect(() => {
+    if (user && !address.phone && !address.street) {
+      setAddress(prev => ({
+        ...prev,
+        phone: user.phone || '',
+        street: user.address || '',
+      }));
+    }
+  }, [user]);
 
   const deliveryCharge = totalAmount >= 499 ? 0 : 49;
   const grandTotal = totalAmount + deliveryCharge;
 
   // Redirect if not logged in or cart is empty
   useEffect(() => {
-    if (!isAuthenticated) { router.push('/login'); return; }
+    if (!isAuthenticated) { router.push('/login?redirect=/checkout'); return; }
     if (items.length === 0 && !orderSuccess) { router.push('/cart'); }
   }, [isAuthenticated, items.length, orderSuccess, router]);
 

@@ -1,22 +1,28 @@
 export interface User {
-  id: string; // Changed from number to string for custom IDs
+  id: string;
   email: string;
   role: 'USER' | 'ADMIN';
+  address?: string;
+  phone?: string;
   createdAt?: string;
 }
 
 export interface Product {
-  id: string; // Changed from number to string
+  id: string; 
+  slug: string;
   name: string;
   description: string;
   price: string;
   stock: number;
   images: string[];
+  specifications?: any;
+  isFeatured?: boolean;
+  discount?: string;
   createdAt: string;
 }
 
 export interface CartItem {
-  productId: string; // Changed from number to string
+  productId: string;
   quantity: number;
   price: number;
   name?: string;
@@ -24,8 +30,9 @@ export interface CartItem {
 }
 
 export interface Order {
-  id: string; // Changed from number to string
-  userId: string; // Changed from number to string
+  id: string;
+  orderNumber: string;
+  userId: string;
   totalAmount: string;
   status: OrderStatus;
   paymentId: string;
@@ -43,7 +50,7 @@ export type OrderStatus =
   | 'CANCELLED';
 
 export interface OrderItem {
-  id: string; // Changed from number to string
+  id: string;
   orderId: string;
   productId: string;
   quantity: number;

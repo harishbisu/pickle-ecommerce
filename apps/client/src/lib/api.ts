@@ -1,22 +1,19 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('pickle_token');
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("pickle_token");
 }
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   const res = await fetch(`${API_BASE}${path}`, {
@@ -26,7 +23,7 @@ async function request<T>(
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.message || 'Request failed');
+    throw new Error(error.message || "Request failed");
   }
 
   // Handle 204 No Content
@@ -37,70 +34,99 @@ async function request<T>(
 export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
+    request<T>(path, { method: "POST", body: JSON.stringify(body) }),
   patch: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
-  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+    request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
+  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };
 
 // ─── Auth API ───────────────────────────────────────────────────────────────
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<{ access_token: string }>('/auth/login', { email, password }),
+    api.post<{ access_token: string }>("/auth/login", { email, password }),
   register: (email: string, password: string) =>
-    api.post<{ id: number; email: string; role: string }>('/auth/register', { email, password }),
-  profile: () => api.get<{ id: number; email: string; role: string }>('/auth/profile'),
+    api.post<{ id: number; email: string; role: string }>("/auth/register", {
+      email,
+      password,
+    }),
+  profile: () =>
+    api.get<{ id: number; email: string; role: string }>("/auth/profile"),
 };
 
 // ─── Products API ────────────────────────────────────────────────────────────
 export const productsApi = {
-  list: () => api.get<Product[]>('/products'),
-  get: (id: number) => api.get<Product>(`/products/${id}`),
-  create: (data: { name: string; description: string; price: number; stock?: number; images?: string[] }) =>
-    api.post<Product>('/products', data),
-  update: (id: number, data: { name?: string; description?: string; price?: number; stock?: number; images?: string[] }) =>
-    api.patch<Product>(`/products/${id}`, data),
-  delete: (id: number) => api.delete<void>(`/products/${id}`),
+  list: () => api.get<Product[]>("/products"),
+  get: (id: string) => api.get<Product>(`/products/${id}`),
+  create: (data: {
+    name: string;
+    description: string;
+    price: number;
+    stock?: number;
+    images?: string[];
+  }) => api.post<Product>("/products", data),
+  update: (
+    id: string,
+    data: {
+      name?: string;
+      description?: string;
+      price?: number;
+      stock?: number;
+      images?: string[];
+    },
+  ) => api.patch<Product>(`/products/${id}`, data),
+  delete: (id: string) => api.delete<void>(`/products/${id}`),
 };
 
 // ─── Orders API ──────────────────────────────────────────────────────────────
 export const ordersApi = {
   checkout: (items: CartItem[]) =>
-    api.post<{ id: number; razorpayOrderId: string; razorpayKeyId: string; totalAmount: string }>(
-      '/orders/checkout',
-      { items },
-    ),
+    api.post<{
+      id: string;
+      razorpayOrderId: string;
+      razorpayKeyId: string;
+      totalAmount: string;
+    }>("/orders/checkout", { items }),
   verifyPayment: (data: {
     razorpayOrderId: string;
     razorpayPaymentId: string;
     razorpaySignature: string;
-  }) => api.post<{ success: boolean; orderId: number }>('/orders/verify-payment', data),
-  track: (id: number) => api.get<Order>(`/orders/track/${id}`),
-  list: () => api.get<Order[]>('/orders'),
-  updateStatus: (id: number, status: string) =>
+  }) =>
+    api.post<{ success: boolean; orderId: string }>(
+      "/orders/verify-payment",
+      data,
+    ),
+  track: (id: string) => api.get<Order>(`/orders/track/${id}`),
+  list: () => api.get<Order[]>("/orders"),
+  updateStatus: (id: string, status: string) =>
     api.patch<Order>(`/orders/${id}/status`, { status }),
 };
 
 // ─── Settings API ─────────────────────────────────────────────────────────────
 export const settingsApi = {
-  getAll: () => api.get<AppSetting[]>('/settings'),
-  get: (key: string) => api.get<{ key: string; value: string }>(`/settings/${key}`),
-  set: (key: string, value: string) => api.post<AppSetting>('/settings', { key, value }),
+  getAll: () => api.get<AppSetting[]>("/settings"),
+  get: (key: string) =>
+    api.get<{ key: string; value: string }>(`/settings/${key}`),
+  set: (key: string, value: string) =>
+    api.post<AppSetting>("/settings", { key, value }),
 };
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export interface Product {
-  id: number;
+  slug: string;
+  id: string;
   name: string;
   description: string;
   price: string;
   stock: number;
   images: string[];
   createdAt: string;
+  discount?: string;
+  specifications?: Record<string, string>;
+  isFeatured?: boolean;
 }
 
 export interface CartItem {
-  productId: number;
+  productId: string;
   quantity: number;
   price: number;
   name?: string;
@@ -108,8 +134,8 @@ export interface CartItem {
 }
 
 export interface Order {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   totalAmount: string;
   status: string;
   paymentId: string;
@@ -119,15 +145,15 @@ export interface Order {
 }
 
 export interface OrderItem {
-  id: number;
-  orderId: number;
-  productId: number;
+  id: string;
+  orderId: string;
+  productId: string;
   quantity: number;
   price: string;
 }
 
 export interface AppSetting {
-  id: number;
+  id: string;
   settingKey: string;
   settingValue: string;
 }

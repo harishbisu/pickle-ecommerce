@@ -15,12 +15,14 @@ import {
 } from "@chakra-ui/react";
 import { ShoppingCart, User, LogOut, Package, ChevronDown } from "lucide-react";
 import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 import { useCart } from "../providers/CartContext";
 import { useAuth } from "../providers/AuthContext";
 
 export function Navbar() {
   const { totalItems } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
+  const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -67,7 +69,7 @@ export function Navbar() {
           {!isAuthenticated ? (
             <Button
               as={NextLink}
-              href="/login"
+              href={`/login?redirect=${pathname}`}
               bg="white"
               color="#2874f0"
               px={{ base: 4, md: 6, lg: 8, xl: 10 }}

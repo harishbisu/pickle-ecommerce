@@ -15,21 +15,16 @@ const class_transformer_1 = require("class-transformer");
 class OrderItemDto {
     productId;
     quantity;
-    price;
 }
 exports.OrderItemDto = OrderItemDto;
 __decorate([
-    (0, class_validator_1.IsNumber)({}, { message: 'Product ID must be a number' }),
-    __metadata("design:type", Number)
+    (0, class_validator_1.IsString)({ message: 'Product ID must be a string' }),
+    __metadata("design:type", String)
 ], OrderItemDto.prototype, "productId", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)({}, { message: 'Quantity must be a number' }),
     __metadata("design:type", Number)
 ], OrderItemDto.prototype, "quantity", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)({}, { message: 'Price must be a number' }),
-    __metadata("design:type", Number)
-], OrderItemDto.prototype, "price", void 0);
 class CheckoutDto {
     items;
 }

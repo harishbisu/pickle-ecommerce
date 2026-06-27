@@ -76,7 +76,7 @@ function OrderReceipt({ order }: { order: Order }) {
       {/* Receipt body — GPay-style rows */}
       <CardBody p={0}>
         {[
-          { label: 'Total Amount', value: `₹${order.totalAmount}`, bold: true },
+          ...(order.totalAmount ? [{ label: 'Total Amount', value: `₹${order.totalAmount}`, bold: true }] : []),
           ...(order.paymentId ? [{ label: 'Payment ID', value: order.paymentId.slice(0, 24) + '...', mono: true }] : []),
           { label: 'Order Date', value: order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—' },
           ...(order.trackingId ? [{ label: 'Tracking ID', value: order.trackingId, mono: true }] : []),
@@ -254,13 +254,12 @@ function TrackPageContent() {
   const handleTrack = async (id?: string) => {
     const trackId = id || orderId;
     if (!trackId) return;
-    if (!isAuthenticated) { setError('Please sign in to track your order'); return; }
     setLoading(true);
     setError('');
     setSearched(true);
     try {
-      const data = await ordersApi.track(parseInt(trackId));
-      if (!data) { setError('Order not found. Please check the order ID.'); setOrder(null); }
+      const data = await ordersApi.track(trackId);
+      if (!data) { setError('Order not found. Please check the order number.'); setOrder(null); }
       else setOrder(data);
     } catch (err: any) {
       setError(err.message || 'Unable to track order. Please try again.');
@@ -297,13 +296,13 @@ function TrackPageContent() {
             <InputGroup size="lg">
               <Input
                 id="track-order-input"
-                placeholder="Order ID (e.g. 42)"
+                placeholder="Order Number (e.g. ORD-XXX)"
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
                 borderRadius="12px"
                 fontSize="15px"
                 onKeyDown={(e) => e.key === 'Enter' && handleTrack()}
-                type="number"
+                type="text"
                 bg="surface.50"
                 _focus={{ bg: 'white' }}
               />
@@ -324,18 +323,7 @@ function TrackPageContent() {
               </InputRightElement>
             </InputGroup>
 
-            {!isAuthenticated && (
-              <Alert status="warning" mt={4} borderRadius="10px" fontSize="13px">
-                <AlertIcon />
-                <Text>
-                  Please{' '}
-                  <Button as={NextLink} href="/login" variant="link" fontSize="13px" color="brand.500">
-                    sign in
-                  </Button>
-                  {' '}to track your orders.
-                </Text>
-              </Alert>
-            )}
+            {/* Removed authentication requirement warning */}
           </CardBody>
         </Card>
 

@@ -8,12 +8,12 @@ export declare class SettingsController {
         value: string;
     }>;
     getAll(): Promise<{
-        id: number;
+        id: string;
         settingKey: string;
         settingValue: string;
     }[]>;
     setSetting(body: SetSettingDto): Promise<{
-        id: number;
+        id: string;
         settingKey: string;
         settingValue: string;
     }>;

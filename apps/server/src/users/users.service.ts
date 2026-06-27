@@ -11,7 +11,7 @@ export class UsersService {
     return result[0];
   }
 
-  async findById(id: number) {
+  async findById(id: string) {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return result[0];
   }

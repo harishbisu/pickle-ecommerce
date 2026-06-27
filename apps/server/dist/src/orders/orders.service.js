@@ -60,37 +60,55 @@ let OrdersService = class OrdersService {
         if (!items || items.length === 0) {
             throw new common_1.BadRequestException('Order must contain at least one item');
         }
-        const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const productIds = items.map(i => i.productId);
+        const dbProducts = await db_1.db.select().from(schema_1.products).where((0, drizzle_orm_1.inArray)(schema_1.products.id, productIds));
+        if (dbProducts.length !== productIds.length) {
+            throw new common_1.BadRequestException('One or more products are invalid');
+        }
+        let totalAmount = 0;
+        const finalItems = items.map(item => {
+            const p = dbProducts.find(prod => prod.id === item.productId);
+            if (!p)
+                throw new common_1.BadRequestException('Product not found');
+            let price = parseFloat(p.price);
+            if (p.discount && parseFloat(p.discount) > 0) {
+                price = price - (price * (parseFloat(p.discount) / 100));
+                price = Math.max(price, 0);
+            }
+            totalAmount += price * item.quantity;
+            return { productId: item.productId, quantity: item.quantity, price: price.toString() };
+        });
         const minOrderSetting = await db_1.db
             .select()
             .from(schema_1.appSettings)
             .where((0, drizzle_orm_1.eq)(schema_1.appSettings.settingKey, 'MIN_ORDER_PRICE'))
             .limit(1);
-        const minOrderPrice = minOrderSetting[0]?.settingValue
-            ? parseFloat(minOrderSetting[0].settingValue)
-            : 0;
+        const minOrderPrice = minOrderSetting[0]?.settingValue ? parseFloat(minOrderSetting[0].settingValue) : 0;
         if (totalAmount < minOrderPrice) {
             throw new common_1.BadRequestException(`Minimum order amount is ₹${minOrderPrice}`);
         }
+        const orderNumber = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
         const rpOrder = await razorpay.orders.create({
             amount: Math.round(totalAmount * 100),
             currency: 'INR',
+            receipt: orderNumber,
         });
         const dbOrder = await db_1.db
             .insert(schema_1.orders)
             .values({
+            orderNumber,
             userId,
             totalAmount: totalAmount.toString(),
             status: 'ACKNOWLEDGED',
             paymentId: rpOrder.id,
         })
             .returning();
-        for (const item of items) {
+        for (const item of finalItems) {
             await db_1.db.insert(schema_1.orderItems).values({
                 orderId: dbOrder[0].id,
                 productId: item.productId,
                 quantity: item.quantity,
-                price: item.price.toString(),
+                price: item.price,
             });
         }
         return {
@@ -101,14 +119,10 @@ let OrdersService = class OrdersService {
     }
     async verifyPayment(razorpayOrderId, razorpayPaymentId, razorpaySignature) {
         const secret = process.env.RAZORPAY_KEY_SECRET;
-        if (!secret) {
+        if (!secret)
             throw new common_1.BadRequestException('Payment gateway not configured');
-        }
         const body = razorpayOrderId + '|' + razorpayPaymentId;
-        const expectedSignature = crypto
-            .createHmac('sha256', secret)
-            .update(body)
-            .digest('hex');
+        const expectedSignature = crypto.createHmac('sha256', secret).update(body).digest('hex');
         let isValid = false;
         try {
             isValid = crypto.timingSafeEqual(Buffer.from(expectedSignature, 'hex'), Buffer.from(razorpaySignature, 'hex'));
@@ -116,20 +130,13 @@ let OrdersService = class OrdersService {
         catch (err) {
             return { valid: false };
         }
-        if (!isValid) {
+        if (!isValid)
             return { valid: false };
-        }
-        const existingOrder = await db_1.db
-            .select()
-            .from(schema_1.orders)
-            .where((0, drizzle_orm_1.eq)(schema_1.orders.paymentId, razorpayOrderId))
-            .limit(1);
-        if (!existingOrder.length) {
+        const existingOrder = await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.paymentId, razorpayOrderId)).limit(1);
+        if (!existingOrder.length)
             return { valid: false };
-        }
-        if (existingOrder[0].status === 'PAID') {
+        if (existingOrder[0].status === 'PAID')
             return { valid: true, orderId: existingOrder[0].id };
-        }
         const orderResult = await db_1.db
             .update(schema_1.orders)
             .set({ status: 'PAID', paymentId: razorpayPaymentId })
@@ -137,16 +144,19 @@ let OrdersService = class OrdersService {
             .returning();
         return { valid: true, orderId: orderResult[0]?.id };
     }
-    async trackOrder(id, userId) {
-        const order = await db_1.db
-            .select()
-            .from(schema_1.orders)
-            .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.orders.id, id), (0, drizzle_orm_1.eq)(schema_1.orders.userId, userId)))
-            .limit(1);
+    async trackOrder(orderNumber, userId) {
+        const order = await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.orderNumber, orderNumber)).limit(1);
         if (!order.length) {
             throw new common_1.NotFoundException('Order not found');
         }
-        const items = await db_1.db.select().from(schema_1.orderItems).where((0, drizzle_orm_1.eq)(schema_1.orderItems.orderId, id));
+        if (!userId || order[0].userId !== userId) {
+            return {
+                orderNumber: order[0].orderNumber,
+                status: order[0].status,
+                message: 'Detailed tracking is only available to the order owner.'
+            };
+        }
+        const items = await db_1.db.select().from(schema_1.orderItems).where((0, drizzle_orm_1.eq)(schema_1.orderItems.orderId, order[0].id));
         return { ...order[0], items };
     }
     async updateStatus(id, status) {
@@ -155,16 +165,34 @@ let OrdersService = class OrdersService {
             throw new common_1.BadRequestException(`Invalid status. Allowed statuses: ${validStatuses.join(', ')}`);
         }
         const result = await db_1.db.update(schema_1.orders).set({ status }).where((0, drizzle_orm_1.eq)(schema_1.orders.id, id)).returning();
-        if (!result.length) {
+        if (!result.length)
             throw new common_1.NotFoundException('Order not found');
-        }
         return result[0];
     }
-    async findAll() {
-        return await db_1.db.select().from(schema_1.orders);
+    async findAll(statusFilter, dateFilter) {
+        let query = db_1.db.select().from(schema_1.orders).orderBy((0, drizzle_orm_1.desc)(schema_1.orders.createdAt));
+        const allOrders = await query;
+        return allOrders.filter((o) => {
+            let pass = true;
+            if (statusFilter === 'NOT_COMPLETED') {
+                pass = pass && !['DELIVERED', 'CANCELLED'].includes(o.status);
+            }
+            if (statusFilter === 'NOT_DELIVERED') {
+                pass = pass && o.status !== 'DELIVERED';
+            }
+            if (statusFilter === 'PAYMENT_NOT_CONFIRMED') {
+                pass = pass && o.status === 'ACKNOWLEDGED';
+            }
+            if (dateFilter === 'TODAY') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                pass = pass && new Date(o.createdAt) >= today;
+            }
+            return pass;
+        });
     }
     async findByUserId(userId) {
-        return await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.userId, userId));
+        return await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.userId, userId)).orderBy((0, drizzle_orm_1.desc)(schema_1.orders.createdAt));
     }
 };
 exports.OrdersService = OrdersService;

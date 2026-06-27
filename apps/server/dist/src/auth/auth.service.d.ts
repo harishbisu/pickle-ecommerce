@@ -9,10 +9,12 @@ export declare class AuthService {
         access_token: string;
     }>;
     register(email: string, pass: string): Promise<{
-        id: number;
+        id: string;
         email: string;
         googleId: string | null;
         role: string;
+        address: string | null;
+        phone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;

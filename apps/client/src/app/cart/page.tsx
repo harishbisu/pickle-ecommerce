@@ -17,7 +17,15 @@ import {
   CardBody,
   useToast,
 } from "@chakra-ui/react";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, Tag, ShoppingCart } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Minus,
+  ShoppingBag,
+  ArrowLeft,
+  Tag,
+  ShoppingCart,
+} from "lucide-react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { Navbar } from "../../components/Navbar";
@@ -49,7 +57,7 @@ export default function CartPage() {
         duration: 3000,
         position: "top-right",
       });
-      router.push("/login");
+      router.push("/login?redirect=/checkout");
       return;
     }
     router.push("/checkout");
@@ -193,7 +201,25 @@ export default function CartPage() {
                             />
                           </HStack>
                           <Text fontWeight="700" color="surface.900">
-                            ₹{(item.price * item.quantity).toFixed(0)}
+                            ₹
+                            {(
+                              (item.price -
+                                (parseFloat(item.discount || "0") *
+                                  item.price) /
+                                  100) *
+                              item.quantity
+                            ).toFixed(0)}
+                            {item.discount != "0" && (
+                              <Text
+                                as="span"
+                                fontWeight="400"
+                                ml={2}
+                                color="red.500"
+                                textDecor={"line-through"}
+                              >
+                                ₹{item.price}
+                              </Text>
+                            )}
                           </Text>
                         </Flex>
                       </Box>

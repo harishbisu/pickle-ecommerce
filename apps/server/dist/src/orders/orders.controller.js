@@ -34,14 +34,14 @@ let OrdersController = class OrdersController {
         }
         return { success: true, orderId: result.orderId };
     }
-    async track(id, req) {
-        return this.ordersService.trackOrder(+id, req.user.id);
+    async trackPublic(orderNumber, req) {
+        return this.ordersService.trackOrder(orderNumber, req.user?.id);
     }
     async updateStatus(id, body) {
-        return this.ordersService.updateStatus(+id, body.status);
+        return this.ordersService.updateStatus(id, body.status);
     }
-    async findAll() {
-        return this.ordersService.findAll();
+    async findAll(status, date) {
+        return this.ordersService.findAll(status, date);
     }
     async getUserOrders(req) {
         return this.ordersService.findByUserId(req.user.id);
@@ -68,14 +68,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "verifyPayment", null);
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    (0, common_1.Get)('track/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)('track/:orderNumber'),
+    __param(0, (0, common_1.Param)('orderNumber')),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], OrdersController.prototype, "track", null);
+], OrdersController.prototype, "trackPublic", null);
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('ADMIN'),
@@ -90,8 +89,10 @@ __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('ADMIN'),
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('status')),
+    __param(1, (0, common_1.Query)('date')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findAll", null);
 __decorate([

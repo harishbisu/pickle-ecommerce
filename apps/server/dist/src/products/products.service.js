@@ -13,7 +13,7 @@ const schema_1 = require("../db/schema");
 const drizzle_orm_1 = require("drizzle-orm");
 let ProductsService = class ProductsService {
     async findAll() {
-        return await db_1.db.select().from(schema_1.products).orderBy(schema_1.products.id);
+        return await db_1.db.select().from(schema_1.products).orderBy(schema_1.products.createdAt);
     }
     async findById(id) {
         const result = await db_1.db.select().from(schema_1.products).where((0, drizzle_orm_1.eq)(schema_1.products.id, id)).limit(1);
@@ -24,10 +24,14 @@ let ProductsService = class ProductsService {
     async create(data) {
         const result = await db_1.db.insert(schema_1.products).values({
             name: data.name,
+            slug: data.slug,
             description: data.description,
             price: data.price.toString(),
             stock: data.stock ?? 0,
             images: data.images || [],
+            specifications: data.specifications || {},
+            isFeatured: data.isFeatured ?? false,
+            discount: data.discount?.toString() || '0',
         }).returning();
         return result[0];
     }
@@ -35,6 +39,8 @@ let ProductsService = class ProductsService {
         const updatePayload = {};
         if (data.name !== undefined)
             updatePayload.name = data.name;
+        if (data.slug !== undefined)
+            updatePayload.slug = data.slug;
         if (data.description !== undefined)
             updatePayload.description = data.description;
         if (data.price !== undefined)
@@ -43,6 +49,12 @@ let ProductsService = class ProductsService {
             updatePayload.stock = data.stock;
         if (data.images !== undefined)
             updatePayload.images = data.images;
+        if (data.specifications !== undefined)
+            updatePayload.specifications = data.specifications;
+        if (data.isFeatured !== undefined)
+            updatePayload.isFeatured = data.isFeatured;
+        if (data.discount !== undefined)
+            updatePayload.discount = data.discount.toString();
         const result = await db_1.db.update(schema_1.products)
             .set(updatePayload)
             .where((0, drizzle_orm_1.eq)(schema_1.products.id, id))

@@ -8,10 +8,11 @@ import {
 } from '@chakra-ui/react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import NextLink from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../providers/AuthContext';
+import { Suspense } from 'react';
 
-export default function LoginPage() {
+function LoginContent() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +22,8 @@ export default function LoginPage() {
 
   const { login, register } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams?.get('redirect') || '/shop';
   const toast = useToast();
 
   const validate = () => {
@@ -53,7 +56,7 @@ export default function LoginPage() {
         duration: 2000,
         position: 'top-right',
       });
-      router.push('/shop');
+      router.push(redirectUrl);
     } catch (err: any) {
       setErrors({ general: err.message || 'Something went wrong. Please try again.' });
     } finally {
@@ -195,5 +198,13 @@ export default function LoginPage() {
         </Text>
       </Flex>
     </Box>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<Box p={10}>Loading...</Box>}>
+      <LoginContent />
+    </Suspense>
   );
 }

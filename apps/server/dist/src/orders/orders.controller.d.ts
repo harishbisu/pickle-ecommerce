@@ -6,10 +6,11 @@ export declare class OrdersController {
     checkout(req: any, body: CheckoutDto): Promise<{
         razorpayOrderId: string;
         razorpayKeyId: string | undefined;
-        id: number;
+        id: string;
         createdAt: Date | null;
         updatedAt: Date | null;
-        userId: number;
+        orderNumber: string;
+        userId: string;
         totalAmount: string;
         status: string;
         paymentId: string | null;
@@ -17,28 +18,35 @@ export declare class OrdersController {
     }>;
     verifyPayment(body: VerifyPaymentDto): Promise<{
         success: boolean;
-        orderId: number | undefined;
+        orderId: string | undefined;
     }>;
-    track(id: string, req: any): Promise<{
+    trackPublic(orderNumber: string, req: any): Promise<{
+        orderNumber: string;
+        status: string;
+        message: string;
+    } | {
         items: {
-            id: number;
-            orderId: number;
-            productId: number;
+            id: string;
+            orderId: string;
+            productId: string;
             quantity: number;
             price: string;
         }[];
-        id: number;
-        userId: number;
+        id: string;
+        orderNumber: string;
+        userId: string;
         totalAmount: string;
         status: string;
         paymentId: string | null;
         trackingId: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
+        message?: undefined;
     }>;
     updateStatus(id: string, body: UpdateOrderStatusDto): Promise<{
-        id: number;
-        userId: number;
+        id: string;
+        orderNumber: string;
+        userId: string;
         totalAmount: string;
         status: string;
         paymentId: string | null;
@@ -46,19 +54,11 @@ export declare class OrdersController {
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;
-    findAll(): Promise<{
-        id: number;
-        userId: number;
-        totalAmount: string;
-        status: string;
-        paymentId: string | null;
-        trackingId: string | null;
-        createdAt: Date | null;
-        updatedAt: Date | null;
-    }[]>;
+    findAll(status?: string, date?: string): Promise<any>;
     getUserOrders(req: any): Promise<{
-        id: number;
-        userId: number;
+        id: string;
+        orderNumber: string;
+        userId: string;
         totalAmount: string;
         status: string;
         paymentId: string | null;

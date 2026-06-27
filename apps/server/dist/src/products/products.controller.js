@@ -28,16 +28,16 @@ let ProductsController = class ProductsController {
         return this.productsService.findAll();
     }
     async findOne(id) {
-        return this.productsService.findById(+id);
+        return this.productsService.findById(id);
     }
     async create(body) {
         return this.productsService.create(body);
     }
     async update(id, body) {
-        return this.productsService.update(+id, body);
+        return this.productsService.update(id, body);
     }
     async remove(id) {
-        return this.productsService.delete(+id);
+        return this.productsService.delete(id);
     }
 };
 exports.ProductsController = ProductsController;

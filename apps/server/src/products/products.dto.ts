@@ -2,14 +2,17 @@ import { IsString, IsNumber, IsOptional, IsArray, IsUrl, Min } from 'class-valid
 
 export class CreateProductDto {
   @IsString({ message: 'Product name must be a string' })
-  name: string;
+  name!: string;
+
+  @IsString({ message: 'Product slug must be a string' })
+  slug!: string;
 
   @IsString({ message: 'Product description must be a string' })
-  description: string;
+  description!: string;
 
   @IsNumber({}, { message: 'Product price must be a number' })
   @Min(0, { message: 'Product price must be greater than or equal to 0' })
-  price: number;
+  price!: number;
 
   @IsOptional()
   @IsNumber({}, { message: 'Stock must be a number' })
@@ -20,12 +23,27 @@ export class CreateProductDto {
   @IsArray({ message: 'Images must be an array' })
   @IsUrl({}, { each: true, message: 'Each image must be a valid URL' })
   images?: string[];
+
+  @IsOptional()
+  specifications?: any;
+
+  @IsOptional()
+  isFeatured?: boolean;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'Discount must be a number' })
+  @Min(0, { message: 'Discount must be greater than or equal to 0' })
+  discount?: number;
 }
 
 export class UpdateProductDto {
   @IsOptional()
   @IsString({ message: 'Product name must be a string' })
   name?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Product slug must be a string' })
+  slug?: string;
 
   @IsOptional()
   @IsString({ message: 'Product description must be a string' })
@@ -45,4 +63,15 @@ export class UpdateProductDto {
   @IsArray({ message: 'Images must be an array' })
   @IsUrl({}, { each: true, message: 'Each image must be a valid URL' })
   images?: string[];
+
+  @IsOptional()
+  specifications?: any;
+
+  @IsOptional()
+  isFeatured?: boolean;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'Discount must be a number' })
+  @Min(0, { message: 'Discount must be greater than or equal to 0' })
+  discount?: number;
 }

@@ -24,8 +24,10 @@ import {
 } from "@chakra-ui/react";
 import { Search, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
 import { Navbar } from "../../components/Navbar";
-import { productsApi, Product } from "../../lib/api";
+import { productsApi } from "../../lib/api";
+import { Product } from "../../types";
 import { useCart } from "../../providers/CartContext";
+import { useRouter } from "next/navigation";
 
 const RATINGS = [4.8, 4.6, 4.7, 4.5, 4.9, 4.4];
 const REVIEW_COUNTS = [234, 89, 156, 312, 67, 143];
@@ -66,19 +68,18 @@ function ProductCard({
 }) {
   const [adding, setAdding] = useState(false);
 
-  const handleAdd = async () => {
+  const handleAdd = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setAdding(true);
     onAddToCart(product);
     setTimeout(() => setAdding(false), 800);
   };
 
+  const router = useRouter();
+
   const rating = RATINGS[idx % RATINGS.length];
   const reviews = REVIEW_COUNTS[idx % REVIEW_COUNTS.length];
-  const discount = Math.round(
-    ((parseFloat(product.price) * 1.25 - parseFloat(product.price)) /
-      (parseFloat(product.price) * 1.25)) *
-      100,
-  );
+  const discount = parseFloat(product.discount || "0").toFixed(0);
 
   return (
     <Card
@@ -90,6 +91,7 @@ function ProductCard({
       className="fade-in"
       cursor="pointer"
       borderRadius="xl"
+      onClick={() => router.push(`/shop/${product.slug || product.id}`)}
     >
       {/* Image */}
       <Box position="relative" overflow="hidden" h="300px" bg="surface.50">
@@ -111,20 +113,22 @@ function ProductCard({
         />
 
         {/* Discount badge */}
-        <Badge
-          position="absolute"
-          top={2.5}
-          left={2.5}
-          bg="red.500"
-          color="white"
-          borderRadius="full"
-          fontSize="10px"
-          fontWeight="700"
-          px={2}
-          py={0.5}
-        >
-          {discount}% OFF
-        </Badge>
+        {discount != "0" && (
+          <Badge
+            position="absolute"
+            top={2.5}
+            left={2.5}
+            bg="red.500"
+            color="white"
+            borderRadius="full"
+            fontSize="10px"
+            fontWeight="700"
+            px={2}
+            py={0.5}
+          >
+            {discount}% OFF
+          </Badge>
+        )}
 
         {/* Low stock badge */}
         {product.stock > 0 && product.stock <= 10 && (
@@ -210,16 +214,22 @@ function ProductCard({
               <Box>
                 <HStack spacing={1.5} align="baseline">
                   <Text fontWeight="800" fontSize="18px" color="surface.900">
-                    ₹{product.price}
+                    ₹
+                    {Math.round(
+                      parseFloat(product.price) *
+                        parseFloat((1 - parseFloat(discount) / 100).toFixed(2)),
+                    )}
                   </Text>
-                  <Text
-                    fontWeight="400"
-                    fontSize="12px"
-                    color="surface.400"
-                    textDecoration="line-through"
-                  >
-                    ₹{Math.round(parseFloat(product.price) * 1.25)}
-                  </Text>
+                  {discount != "0" && (
+                    <Text
+                      fontWeight="400"
+                      fontSize="12px"
+                      color="surface.400"
+                      textDecoration="line-through"
+                    >
+                      ₹{product.price}
+                    </Text>
+                  )}
                 </HStack>
                 <Text fontSize="10px" color="google.green" fontWeight="600">
                   Free delivery
@@ -284,6 +294,8 @@ export default function ShopPage() {
       name: product.name,
       price: parseFloat(product.price),
       image: product.images?.[0] || "",
+      discount: product.discount,
+      slug: product.slug,
     });
     toast({
       title: "Added to cart!",
@@ -309,8 +321,8 @@ export default function ShopPage() {
         return parseFloat(b.price) - parseFloat(a.price);
       if (sort === "rating")
         return (
-          (RATINGS[b.id % RATINGS.length] || 0) -
-          (RATINGS[a.id % RATINGS.length] || 0)
+          (RATINGS[products.indexOf(b) % RATINGS.length] || 0) -
+          (RATINGS[products.indexOf(a) % RATINGS.length] || 0)
         );
       return 0;
     });
@@ -595,7 +607,7 @@ export default function ShopPage() {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  idx={product.id - 1}
+                  idx={idx}
                   onAddToCart={handleAddToCart}
                 />
               ))}

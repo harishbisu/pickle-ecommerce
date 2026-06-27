@@ -19,7 +19,7 @@ export class ProductsController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.productsService.findById(+id);
+    return this.productsService.findById(id);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -36,7 +36,7 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() body: UpdateProductDto,
   ) {
-    return this.productsService.update(+id, body);
+    return this.productsService.update(id, body);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -44,6 +44,6 @@ export class ProductsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
-    return this.productsService.delete(+id);
+    return this.productsService.delete(id);
   }
 }

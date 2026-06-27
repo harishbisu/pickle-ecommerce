@@ -21,55 +21,18 @@ import {
   Star,
   Truck,
   Shield,
-  RefreshCcw,
   ChevronRight,
+  HeadsetIcon,
 } from "lucide-react";
 import NextLink from "next/link";
 import { Navbar } from "../components/Navbar";
 import { useCart } from "../providers/CartContext";
 import { useToast } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import { productsApi } from "../lib/api";
+import { Product } from "../types";
 
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Spicy Mango Pickle",
-    price: 199,
-    originalPrice: 249,
-    image:
-      "https://tse3.mm.bing.net/th/id/OIP.y9hiDDy_L5hpPGtNxWHpbgHaJD?rs=1&pid=ImgDetMain&o=7&rm=3",
-    badge: "Bestseller",
-    badgeColor: "orange",
-    rating: 4.8,
-    reviews: 234,
-    description: "Sun-dried raw mangoes in aromatic mustard oil",
-  },
-  {
-    id: 2,
-    name: "Garlic Pickle",
-    price: 249,
-    originalPrice: 299,
-    image:
-      "https://th.bing.com/th/id/OIP.MDBve5I9-yoNFVxBAmK-UQHaHa?w=181&h=181&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-    badge: "New",
-    badgeColor: "green",
-    rating: 4.6,
-    reviews: 89,
-    description: "Whole garlic cloves slow-pickled in spiced vinegar",
-  },
-  {
-    id: 3,
-    name: "Mixed Veg Pickle",
-    price: 229,
-    originalPrice: 279,
-    image:
-      "https://th.bing.com/th/id/OIP.Z2ONiI-ko832xPs29JOQ7QHaHa?w=215&h=215&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-    badge: "Popular",
-    badgeColor: "blue",
-    rating: 4.7,
-    reviews: 156,
-    description: "Seasonal vegetables pickled with traditional spices",
-  },
-];
+// We will load featured products dynamically.
 
 const features = [
   {
@@ -85,9 +48,9 @@ const features = [
     color: "google.green",
   },
   {
-    icon: RefreshCcw,
-    title: "Easy Returns",
-    desc: "7-day return policy",
+    icon: HeadsetIcon,
+    title: "24/7 Support",
+    desc: "We are here to help",
     color: "google.yellow",
   },
   {
@@ -101,13 +64,30 @@ const features = [
 export default function Home() {
   const { addItem } = useCart();
   const toast = useToast();
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
-  const handleAddToCart = (product: (typeof featuredProducts)[0]) => {
+  useEffect(() => {
+    productsApi
+      .list()
+      .then((data) => {
+        // Filter for featured products, or just take the first 3 if none are marked featured
+        const featured = data.filter((p) => p.isFeatured);
+        if (featured.length >= 3) {
+          setFeaturedProducts(featured.slice(0, 3));
+        } else {
+          setFeaturedProducts(data.slice(0, 3));
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
     addItem({
       productId: product.id,
       name: product.name,
-      price: product.price,
-      image: product.image,
+      price: parseFloat(product.price),
+      image: product.images?.[0] || "",
     });
     toast({
       title: "Added to cart",
@@ -253,57 +233,65 @@ export default function Home() {
 
             {/* Hero Image Grid */}
             <Box flex={1} display={{ base: "none", lg: "block" }}>
-              <SimpleGrid columns={2} spacing={4}>
-                <VStack spacing={4} mt={8}>
-                  <Image
-                    src={featuredProducts[0].image}
-                    alt="Mango Pickle"
-                    borderRadius="16px"
-                    h="180px"
-                    w="full"
-                    objectFit="cover"
-                    boxShadow="lg"
-                  />
-                  <Image
-                    src={featuredProducts[2].image}
-                    alt="Mixed Veg Pickle"
-                    borderRadius="16px"
-                    h="140px"
-                    w="full"
-                    objectFit="cover"
-                    boxShadow="md"
-                  />
-                </VStack>
-                <VStack spacing={4}>
-                  <Image
-                    src={featuredProducts[1].image}
-                    alt="Garlic Pickle"
-                    borderRadius="16px"
-                    h="160px"
-                    w="full"
-                    objectFit="cover"
-                    boxShadow="md"
-                  />
-                  <Box
-                    bg="white"
-                    borderRadius="16px"
-                    p={4}
-                    boxShadow="lg"
-                    border="1px solid"
-                    borderColor="surface.200"
-                  >
-                    <Text fontSize="12px" color="surface.500" mb={1}>
-                      Latest Order
-                    </Text>
-                    <Text fontWeight="600" fontSize="14px">
-                      Spicy Mango Pickle
-                    </Text>
-                    <Badge colorScheme="green" mt={2} fontSize="11px">
-                      Out for Delivery
-                    </Badge>
-                  </Box>
-                </VStack>
-              </SimpleGrid>
+              {featuredProducts.length >= 3 && (
+                <SimpleGrid columns={2} spacing={4}>
+                  <VStack spacing={4} mt={8}>
+                    <Image
+                      src={featuredProducts[0].images?.[0]}
+                      alt={featuredProducts[0].name}
+                      borderRadius="16px"
+                      h="180px"
+                      w="full"
+                      objectFit="cover"
+                      boxShadow="lg"
+                    />
+                    <Image
+                      src={
+                        featuredProducts[2].images?.[0] ||
+                        "https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=400"
+                      }
+                      alt={featuredProducts[2].name}
+                      borderRadius="16px"
+                      h="140px"
+                      w="full"
+                      objectFit="cover"
+                      boxShadow="md"
+                    />
+                  </VStack>
+                  <VStack spacing={4}>
+                    <Image
+                      src={
+                        featuredProducts[1].images?.[0] ||
+                        "https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=400"
+                      }
+                      alt={featuredProducts[1].name}
+                      borderRadius="16px"
+                      h="160px"
+                      w="full"
+                      objectFit="cover"
+                      boxShadow="md"
+                    />
+                    <Box
+                      bg="white"
+                      borderRadius="16px"
+                      p={4}
+                      boxShadow="lg"
+                      border="1px solid"
+                      borderColor="surface.200"
+                    >
+                      <Text fontSize="12px" color="surface.500" mb={1}>
+                        Latest Order
+                      </Text>
+                      <Text fontWeight="600" fontSize="14px">
+                        {featuredProducts[0].name}
+                      </Text>
+                      <Badge colorScheme="green" mt={2} fontSize="11px">
+                        Out for Delivery
+                      </Badge>
+                    </Box>
+                  </VStack>
+                </SimpleGrid>
+              )}
             </Box>
           </Flex>
         </Container>
@@ -325,7 +313,7 @@ export default function Home() {
                   justifyContent="center"
                   flexShrink={0}
                 >
-                  <Icon size={20} color={color} />
+                  <Icon size={20} color={"black"} />
                 </Box>
                 <Box>
                   <Text fontWeight="600" fontSize="13px" color="surface.900">
@@ -376,16 +364,22 @@ export default function Home() {
           {featuredProducts.map((product) => (
             <Card
               key={product.id}
+              as={NextLink}
+              href={`/shop/${product.slug || product.id}`}
               overflow="hidden"
               _hover={{ transform: "translateY(-4px)", boxShadow: "lg" }}
               transition="all 0.2s ease"
               cursor="pointer"
+              borderRadius="xl"
             >
               <Box position="relative">
                 <Image
-                  src={product.image}
+                  src={
+                    product.images?.[0] ||
+                    "https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=400"
+                  }
                   alt={product.name}
-                  h="300px"
+                  h="400px"
                   w="full"
                   objectFit="cover"
                 />
@@ -393,73 +387,85 @@ export default function Home() {
                   position="absolute"
                   top={3}
                   left={3}
-                  colorScheme={product.badgeColor}
+                  colorScheme="orange"
                   borderRadius="full"
                   fontSize="11px"
                   fontWeight="700"
                   px={3}
                   py={1}
                 >
-                  {product.badge}
+                  {product.isFeatured ? "Featured" : "Trending"}
                 </Badge>
               </Box>
               <CardBody p={5}>
-                <Stack spacing={3}>
-                  <Heading size="sm" color="surface.900">
-                    {product.name}
-                  </Heading>
-                  <Text fontSize="13px" color="surface.500" noOfLines={1}>
-                    {product.description}
-                  </Text>
-                  <HStack>
-                    <Text fontSize="12px" color="google.yellow">
-                      {"★".repeat(Math.floor(product.rating))}
+                <Stack spacing={3} justify="space-between" h="full">
+                  <VStack align="strech" spacing={1}>
+                    <Heading size="sm" color="surface.900">
+                      {product.name}
+                    </Heading>
+                    <Text fontSize="13px" color="surface.500" noOfLines={1}>
+                      {product.description}
                     </Text>
-                    <Text fontSize="12px" color="surface.600">
-                      {product.rating}
-                    </Text>
-                    <Text fontSize="12px" color="surface.400">
-                      ({product.reviews})
-                    </Text>
-                  </HStack>
-                  <Flex align="center" justify="space-between">
-                    <HStack spacing={2} align="baseline">
-                      <Text fontWeight="700" fontSize="lg" color="surface.900">
-                        ₹{product.price}
+                  </VStack>
+                  <VStack align="strech" spacing={1}>
+                    <HStack>
+                      <Text fontSize="12px" color="google.yellow">
+                        {"★".repeat(5)}
                       </Text>
-                      <Text
-                        fontSize="13px"
-                        color="surface.400"
-                        textDecoration="line-through"
-                      >
-                        ₹{product.originalPrice}
+                      <Text fontSize="12px" color="surface.600">
+                        4.8
+                      </Text>
+                      <Text fontSize="12px" color="surface.400">
+                        (120)
                       </Text>
                     </HStack>
-                    <Badge colorScheme="green" fontSize="11px">
-                      {Math.round(
-                        ((product.originalPrice - product.price) /
-                          product.originalPrice) *
-                          100,
+                    <Flex align="center" justify="space-between">
+                      <HStack spacing={2} align="baseline">
+                        <Text
+                          fontWeight="700"
+                          fontSize="lg"
+                          color="surface.900"
+                        >
+                          ₹{product.price}
+                        </Text>
+                        {parseFloat(product.discount || "0") && (
+                          <Text
+                            fontSize="13px"
+                            color="surface.400"
+                            textDecoration="line-through"
+                          >
+                            ₹
+                            {Math.round(
+                              parseFloat(product.price) -
+                                (parseFloat(product.discount || "0") *
+                                  parseFloat(product.price)) /
+                                  100,
+                            )}
+                          </Text>
+                        )}
+                      </HStack>
+                      {product.discount && (
+                        <Badge colorScheme="green" fontSize="11px">
+                          {parseFloat(product.discount || "0")}% off
+                        </Badge>
                       )}
-                      % off
-                    </Badge>
-                  </Flex>
-                  <Button
-                    w="full"
-                    size="sm"
-                    borderRadius="8px"
-                    leftIcon={<ShoppingBag size={14} />}
-                    onClick={() => handleAddToCart(product)}
-                  >
-                    Add to Cart
-                  </Button>
+                    </Flex>
+                    <Button
+                      w="full"
+                      size="sm"
+                      borderRadius="8px"
+                      leftIcon={<ShoppingBag size={14} />}
+                      onClick={(e) => handleAddToCart(e, product)}
+                    >
+                      Add to Cart
+                    </Button>
+                  </VStack>
                 </Stack>
               </CardBody>
             </Card>
           ))}
         </SimpleGrid>
       </Container>
-
     </Box>
   );
 }

@@ -1,12 +1,12 @@
 export declare class SettingsService {
     getAll(): Promise<{
-        id: number;
+        id: string;
         settingKey: string;
         settingValue: string;
     }[]>;
     getSetting(key: string): Promise<string>;
     setSetting(key: string, value: string): Promise<{
-        id: number;
+        id: string;
         settingKey: string;
         settingValue: string;
     }>;

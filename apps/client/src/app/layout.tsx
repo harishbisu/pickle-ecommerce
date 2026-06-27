@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ChakraProvider } from "../providers/ChakraProvider";
+import { UtmTracker } from "../components/UtmTracker";
+import { Suspense } from "react";
 import { AuthProvider } from "../providers/AuthContext";
 import { CartProvider } from "../providers/CartContext";
 import { Footer } from "@/components/Footer";
@@ -47,6 +49,9 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <Suspense fallback={null}>
+          <UtmTracker />
+        </Suspense>
         <ChakraProvider>
           <AuthProvider>
             <CartProvider>{children}</CartProvider>
