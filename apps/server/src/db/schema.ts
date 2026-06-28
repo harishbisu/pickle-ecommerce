@@ -109,3 +109,12 @@ export const issues = pgTable('issues', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+export const promotionalVisits = pgTable('promotional_visits', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  utmSource: text('utm_source').notNull().unique(),
+  visitCount: integer('visit_count').notNull().default(0),
+  url: text('url'), // Optional, to store the generated URL
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});

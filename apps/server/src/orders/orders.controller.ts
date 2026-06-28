@@ -58,8 +58,15 @@ export class OrdersController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('ADMIN')
   @Get()
-  async findAll(@Query('status') status?: string, @Query('date') date?: string) {
-    return this.ordersService.findAll(status, date);
+  async findAll(
+    @Query('status') status?: string, 
+    @Query('date') date?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    return this.ordersService.findAll(status, date, pageNum, limitNum);
   }
 
   @UseGuards(AuthGuard('jwt'))

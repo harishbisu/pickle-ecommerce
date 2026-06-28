@@ -29,4 +29,8 @@ export class UsersService {
     const result = await db.update(users).set(data).where(eq(users.id, id)).returning();
     return result[0];
   }
+
+  async findAll() {
+    return await db.select().from(users);
+  }
 }

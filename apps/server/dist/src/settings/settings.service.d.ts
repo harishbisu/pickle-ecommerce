@@ -10,4 +10,17 @@ export declare class SettingsService {
         settingKey: string;
         settingValue: string;
     }>;
+    createPromotionalUrl(utmSource: string): Promise<{
+        url: string;
+        utmSource: string;
+    }>;
+    getPromotionalVisits(): Promise<{
+        id: string;
+        utmSource: string;
+        visitCount: number;
+        url: string | null;
+        createdAt: Date | null;
+        updatedAt: Date | null;
+    }[]>;
+    trackVisit(utmSource: string): Promise<void>;
 }

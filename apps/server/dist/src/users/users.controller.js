@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const passport_1 = require("@nestjs/passport");
 const throttler_1 = require("@nestjs/throttler");
+const roles_guard_1 = require("../auth/roles.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -25,6 +27,9 @@ let UsersController = class UsersController {
     async updateProfile(req, body) {
         const { name, address, state, phone } = body;
         return this.usersService.updateProfile(req.user.id, { name, address, state, phone });
+    }
+    async findAll() {
+        return this.usersService.findAll();
     }
 };
 exports.UsersController = UsersController;
@@ -37,6 +42,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateProfile", null);
+__decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "findAll", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), throttler_1.ThrottlerGuard),

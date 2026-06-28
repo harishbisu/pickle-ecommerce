@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { db } from '../db';
 import { orders, orderItems, appSettings, products, users } from '../db/schema';
-import { eq, and, inArray, desc, gte } from 'drizzle-orm';
+import { eq, and, ne, notInArray, inArray, desc, gte } from 'drizzle-orm';
 import Razorpay from 'razorpay';
 import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
@@ -79,7 +79,7 @@ export class OrdersService {
     const minOrderSetting = await db
       .select()
       .from(appSettings)
-      .where(eq(appSettings.settingKey, 'MIN_ORDER_PRICE'))
+      .where(eq(appSettings.settingKey, 'MIN_CART_SIZE'))
       .limit(1);
     const minOrderPrice = minOrderSetting[0]?.settingValue
       ? parseFloat(minOrderSetting[0].settingValue)
@@ -244,15 +244,68 @@ export class OrdersService {
     return result[0];
   }
 
-  async findAll(statusFilter?: string, dateFilter?: string) {
-    let query: any = db.select().from(orders).orderBy(desc(orders.createdAt));
+  async findAll(
+    statusFilter?: string,
+    dateFilter?: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const conditions = [];
 
-    // Client-side filtering logic could also be done here, but Drizzle where is better.
-    // For simplicity, we will fetch and filter in memory if complex, or just use basic where clauses.
-    const allOrders = await query;
+    if (statusFilter === 'NOT_COMPLETED') {
+      conditions.push(notInArray(orders.status, ['DELIVERED', 'CANCELLED']));
+    }
+    if (statusFilter === 'NOT_DELIVERED') {
+      conditions.push(ne(orders.status, 'DELIVERED'));
+    }
+    if (
+      statusFilter === 'PAYMENT_NOT_CONFIRMED' ||
+      statusFilter === 'Pending Payment' ||
+      statusFilter === 'ACKNOWLEDGED'
+    ) {
+      conditions.push(eq(orders.status, 'ACKNOWLEDGED'));
+    }
+    if (statusFilter === 'DELIVERED') {
+      conditions.push(eq(orders.status, 'DELIVERED'));
+    }
+    if (statusFilter === 'PAID') {
+      conditions.push(eq(orders.status, 'PAID'));
+    }
+    if (statusFilter === 'IN_TRANSIT') {
+      conditions.push(eq(orders.status, 'IN_TRANSIT'));
+    }
+    if (statusFilter === 'DISPATCHED') {
+      conditions.push(eq(orders.status, 'DISPATCHED'));
+    }
+    if (statusFilter === 'OUT_FOR_DELIVERY') {
+      conditions.push(eq(orders.status, 'OUT_FOR_DELIVERY'));
+    }
+    if (statusFilter === 'CANCELLED') {
+      conditions.push(eq(orders.status, 'CANCELLED'));
+    }
+    if (dateFilter === 'TODAY' || dateFilter === 'Today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      conditions.push(gte(orders.createdAt, today));
+    }
 
-    // Fetch items for all orders
-    const orderIds = allOrders.map((o: any) => o.id);
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const paginatedOrders = await db
+      .select()
+      .from(orders)
+      .where(whereClause)
+      .orderBy(desc(orders.createdAt))
+      .limit(limit + 1)
+      .offset((page - 1) * limit);
+
+    const hasMore = paginatedOrders.length > limit;
+
+    const ordersData = hasMore
+      ? paginatedOrders.slice(0, limit)
+      : paginatedOrders;
+
+    const orderIds = ordersData.map((o) => o.id);
     let allItems: any[] = [];
     if (orderIds.length > 0) {
       allItems = await db
@@ -269,29 +322,15 @@ export class OrdersService {
         .where(inArray(orderItems.orderId, orderIds));
     }
 
-    const filtered = allOrders.filter((o: any) => {
-      let pass = true;
-      if (statusFilter === 'NOT_COMPLETED') {
-        pass = pass && !['DELIVERED', 'CANCELLED'].includes(o.status);
-      }
-      if (statusFilter === 'NOT_DELIVERED') {
-        pass = pass && o.status !== 'DELIVERED';
-      }
-      if (statusFilter === 'PAYMENT_NOT_CONFIRMED') {
-        pass = pass && o.status === 'ACKNOWLEDGED';
-      }
-      if (dateFilter === 'TODAY') {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        pass = pass && new Date(o.createdAt) >= today;
-      }
-      return pass;
-    });
-
-    return filtered.map((order: any) => ({
-      ...order,
-      items: allItems.filter((item) => item.orderId === order.id),
-    }));
+    return {
+      data: ordersData.map((order) => ({
+        ...order,
+        items: allItems.filter((item) => item.orderId === order.id),
+      })),
+      page,
+      limit,
+      hasMore,
+    };
   }
 
   async findByUserId(userId: string) {

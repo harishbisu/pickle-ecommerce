@@ -34,6 +34,16 @@ let SettingsController = class SettingsController {
     async setSetting(body) {
         return this.settingsService.setSetting(body.key, body.value);
     }
+    async createPromotion(utmSource) {
+        return this.settingsService.createPromotionalUrl(utmSource);
+    }
+    async getPromotions() {
+        return this.settingsService.getPromotionalVisits();
+    }
+    async trackPromotion(utmSource) {
+        await this.settingsService.trackVisit(utmSource);
+        return { success: true };
+    }
 };
 exports.SettingsController = SettingsController;
 __decorate([
@@ -60,6 +70,30 @@ __decorate([
     __metadata("design:paramtypes", [settings_dto_1.SetSettingDto]),
     __metadata("design:returntype", Promise)
 ], SettingsController.prototype, "setSetting", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, common_1.Post)('promotions'),
+    __param(0, (0, common_1.Body)('utmSource')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SettingsController.prototype, "createPromotion", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    (0, common_1.Get)('promotions/visits'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], SettingsController.prototype, "getPromotions", null);
+__decorate([
+    (0, common_1.Post)('promotions/track'),
+    __param(0, (0, common_1.Body)('utmSource')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SettingsController.prototype, "trackPromotion", null);
 exports.SettingsController = SettingsController = __decorate([
     (0, common_1.Controller)('settings'),
     __metadata("design:paramtypes", [settings_service_1.SettingsService])

@@ -17,4 +17,19 @@ export declare class SettingsController {
         settingKey: string;
         settingValue: string;
     }>;
+    createPromotion(utmSource: string): Promise<{
+        url: string;
+        utmSource: string;
+    }>;
+    getPromotions(): Promise<{
+        id: string;
+        utmSource: string;
+        visitCount: number;
+        url: string | null;
+        createdAt: Date | null;
+        updatedAt: Date | null;
+    }[]>;
+    trackPromotion(utmSource: string): Promise<{
+        success: boolean;
+    }>;
 }

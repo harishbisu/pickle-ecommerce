@@ -100,7 +100,7 @@ let OrdersService = class OrdersService {
         const minOrderSetting = await db_1.db
             .select()
             .from(schema_1.appSettings)
-            .where((0, drizzle_orm_1.eq)(schema_1.appSettings.settingKey, 'MIN_ORDER_PRICE'))
+            .where((0, drizzle_orm_1.eq)(schema_1.appSettings.settingKey, 'MIN_CART_SIZE'))
             .limit(1);
         const minOrderPrice = minOrderSetting[0]?.settingValue
             ? parseFloat(minOrderSetting[0].settingValue)
@@ -235,10 +235,55 @@ let OrdersService = class OrdersService {
             throw new common_1.NotFoundException('Order not found');
         return result[0];
     }
-    async findAll(statusFilter, dateFilter) {
-        let query = db_1.db.select().from(schema_1.orders).orderBy((0, drizzle_orm_1.desc)(schema_1.orders.createdAt));
-        const allOrders = await query;
-        const orderIds = allOrders.map((o) => o.id);
+    async findAll(statusFilter, dateFilter, page = 1, limit = 10) {
+        const conditions = [];
+        if (statusFilter === 'NOT_COMPLETED') {
+            conditions.push((0, drizzle_orm_1.notInArray)(schema_1.orders.status, ['DELIVERED', 'CANCELLED']));
+        }
+        if (statusFilter === 'NOT_DELIVERED') {
+            conditions.push((0, drizzle_orm_1.ne)(schema_1.orders.status, 'DELIVERED'));
+        }
+        if (statusFilter === 'PAYMENT_NOT_CONFIRMED' ||
+            statusFilter === 'Pending Payment' ||
+            statusFilter === 'ACKNOWLEDGED') {
+            conditions.push((0, drizzle_orm_1.eq)(schema_1.orders.status, 'ACKNOWLEDGED'));
+        }
+        if (statusFilter === 'DELIVERED') {
+            conditions.push((0, drizzle_orm_1.eq)(schema_1.orders.status, 'DELIVERED'));
+        }
+        if (statusFilter === 'PAID') {
+            conditions.push((0, drizzle_orm_1.eq)(schema_1.orders.status, 'PAID'));
+        }
+        if (statusFilter === 'IN_TRANSIT') {
+            conditions.push((0, drizzle_orm_1.eq)(schema_1.orders.status, 'IN_TRANSIT'));
+        }
+        if (statusFilter === 'DISPATCHED') {
+            conditions.push((0, drizzle_orm_1.eq)(schema_1.orders.status, 'DISPATCHED'));
+        }
+        if (statusFilter === 'OUT_FOR_DELIVERY') {
+            conditions.push((0, drizzle_orm_1.eq)(schema_1.orders.status, 'OUT_FOR_DELIVERY'));
+        }
+        if (statusFilter === 'CANCELLED') {
+            conditions.push((0, drizzle_orm_1.eq)(schema_1.orders.status, 'CANCELLED'));
+        }
+        if (dateFilter === 'TODAY' || dateFilter === 'Today') {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            conditions.push((0, drizzle_orm_1.gte)(schema_1.orders.createdAt, today));
+        }
+        const whereClause = conditions.length > 0 ? (0, drizzle_orm_1.and)(...conditions) : undefined;
+        const paginatedOrders = await db_1.db
+            .select()
+            .from(schema_1.orders)
+            .where(whereClause)
+            .orderBy((0, drizzle_orm_1.desc)(schema_1.orders.createdAt))
+            .limit(limit + 1)
+            .offset((page - 1) * limit);
+        const hasMore = paginatedOrders.length > limit;
+        const ordersData = hasMore
+            ? paginatedOrders.slice(0, limit)
+            : paginatedOrders;
+        const orderIds = ordersData.map((o) => o.id);
         let allItems = [];
         if (orderIds.length > 0) {
             allItems = await db_1.db
@@ -254,28 +299,15 @@ let OrdersService = class OrdersService {
                 .leftJoin(schema_1.products, (0, drizzle_orm_1.eq)(schema_1.orderItems.productId, schema_1.products.id))
                 .where((0, drizzle_orm_1.inArray)(schema_1.orderItems.orderId, orderIds));
         }
-        const filtered = allOrders.filter((o) => {
-            let pass = true;
-            if (statusFilter === 'NOT_COMPLETED') {
-                pass = pass && !['DELIVERED', 'CANCELLED'].includes(o.status);
-            }
-            if (statusFilter === 'NOT_DELIVERED') {
-                pass = pass && o.status !== 'DELIVERED';
-            }
-            if (statusFilter === 'PAYMENT_NOT_CONFIRMED') {
-                pass = pass && o.status === 'ACKNOWLEDGED';
-            }
-            if (dateFilter === 'TODAY') {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                pass = pass && new Date(o.createdAt) >= today;
-            }
-            return pass;
-        });
-        return filtered.map((order) => ({
-            ...order,
-            items: allItems.filter((item) => item.orderId === order.id),
-        }));
+        return {
+            data: ordersData.map((order) => ({
+                ...order,
+                items: allItems.filter((item) => item.orderId === order.id),
+            })),
+            page,
+            limit,
+            hasMore,
+        };
     }
     async findByUserId(userId) {
         return await db_1.db

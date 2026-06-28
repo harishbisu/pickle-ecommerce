@@ -46,8 +46,10 @@ let OrdersController = class OrdersController {
     async updateStatus(id, body) {
         return this.ordersService.updateStatus(id, body.status);
     }
-    async findAll(status, date) {
-        return this.ordersService.findAll(status, date);
+    async findAll(status, date, page, limit) {
+        const pageNum = page ? parseInt(page, 10) : 1;
+        const limitNum = limit ? parseInt(limit, 10) : 10;
+        return this.ordersService.findAll(status, date, pageNum, limitNum);
     }
     async getUserOrders(req) {
         return this.ordersService.findByUserId(req.user.id);
@@ -98,8 +100,10 @@ __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('status')),
     __param(1, (0, common_1.Query)('date')),
+    __param(2, (0, common_1.Query)('page')),
+    __param(3, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findAll", null);
 __decorate([

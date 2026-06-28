@@ -6,10 +6,6 @@ export declare class OrdersController {
     checkout(req: any, body: CheckoutDto): Promise<{
         razorpayOrderId: string;
         razorpayKeyId: string | undefined;
-        shippingName: string | null;
-        shippingAddress: string | null;
-        shippingState: string | null;
-        shippingPhone: string | null;
         id: string;
         createdAt: Date | null;
         updatedAt: Date | null;
@@ -19,6 +15,10 @@ export declare class OrdersController {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
     }>;
     verifyPayment(body: VerifyPaymentDto): Promise<{
         success: boolean;
@@ -66,7 +66,27 @@ export declare class OrdersController {
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;
-    findAll(status?: string, date?: string): Promise<any>;
+    findAll(status?: string, date?: string, page?: string, limit?: string): Promise<{
+        data: {
+            items: any[];
+            id: string;
+            orderNumber: string;
+            userId: string;
+            totalAmount: string;
+            status: string;
+            paymentId: string | null;
+            trackingId: string | null;
+            shippingName: string | null;
+            shippingAddress: string | null;
+            shippingState: string | null;
+            shippingPhone: string | null;
+            createdAt: Date | null;
+            updatedAt: Date | null;
+        }[];
+        page: number;
+        limit: number;
+        hasMore: boolean;
+    }>;
     getUserOrders(req: any): Promise<{
         id: string;
         orderNumber: string;

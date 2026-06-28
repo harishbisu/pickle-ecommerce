@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { AuthProvider } from "../providers/AuthContext";
 import { CartProvider } from "../providers/CartContext";
 import { Footer } from "@/components/Footer";
+import { PaymentOfflineSync } from "../components/PaymentOfflineSync";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -57,6 +58,7 @@ export default function RootLayout({
             <CartProvider>{children}</CartProvider>
           </AuthProvider>
           <Footer />
+          <PaymentOfflineSync />
         </ChakraProvider>
       </body>
     </html>

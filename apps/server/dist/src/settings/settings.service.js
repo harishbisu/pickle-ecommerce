@@ -41,6 +41,29 @@ let SettingsService = class SettingsService {
             return result[0];
         }
     }
+    async createPromotionalUrl(utmSource) {
+        const url = `?utmmedia=${utmSource}`;
+        const existing = await db_1.db.select().from(schema_1.promotionalVisits).where((0, drizzle_orm_1.eq)(schema_1.promotionalVisits.utmSource, utmSource)).limit(1);
+        if (!existing.length) {
+            await db_1.db.insert(schema_1.promotionalVisits).values({
+                utmSource,
+                url,
+            });
+        }
+        return { url, utmSource };
+    }
+    async getPromotionalVisits() {
+        return await db_1.db.select().from(schema_1.promotionalVisits).orderBy(schema_1.promotionalVisits.createdAt);
+    }
+    async trackVisit(utmSource) {
+        const existing = await db_1.db.select().from(schema_1.promotionalVisits).where((0, drizzle_orm_1.eq)(schema_1.promotionalVisits.utmSource, utmSource)).limit(1);
+        if (existing.length) {
+            await db_1.db.update(schema_1.promotionalVisits).set({ visitCount: existing[0].visitCount + 1 }).where((0, drizzle_orm_1.eq)(schema_1.promotionalVisits.utmSource, utmSource));
+        }
+        else {
+            await db_1.db.insert(schema_1.promotionalVisits).values({ utmSource, visitCount: 1, url: `?utmmedia=${utmSource}` });
+        }
+    }
 };
 exports.SettingsService = SettingsService;
 exports.SettingsService = SettingsService = __decorate([

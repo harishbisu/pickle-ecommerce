@@ -70,7 +70,27 @@ export declare class OrdersService {
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;
-    findAll(statusFilter?: string, dateFilter?: string): Promise<any>;
+    findAll(statusFilter?: string, dateFilter?: string, page?: number, limit?: number): Promise<{
+        data: {
+            items: any[];
+            id: string;
+            orderNumber: string;
+            userId: string;
+            totalAmount: string;
+            status: string;
+            paymentId: string | null;
+            trackingId: string | null;
+            shippingName: string | null;
+            shippingAddress: string | null;
+            shippingState: string | null;
+            shippingPhone: string | null;
+            createdAt: Date | null;
+            updatedAt: Date | null;
+        }[];
+        page: number;
+        limit: number;
+        hasMore: boolean;
+    }>;
     findByUserId(userId: string): Promise<{
         id: string;
         orderNumber: string;

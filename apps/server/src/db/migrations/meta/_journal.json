@@ -15,6 +15,13 @@
       "when": 1782564510895,
       "tag": "0001_fluffy_skin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782624010670,
+      "tag": "0002_common_raza",
+      "breakpoints": true
     }
   ]
 }

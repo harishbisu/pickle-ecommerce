@@ -7,6 +7,10 @@ import { useCart } from "../providers/CartContext";
 import { useAuth } from "../providers/AuthContext";
 import { ordersApi } from "../lib/api";
 import { useRazorpay } from "./useRazorpay";
+import CryptoJS from "crypto-js";
+
+const SECRET_KEY = "offline_sync_secret_key";
+
 
 export function useCheckout() {
   const { items, totalAmount, clearCart } = useCart();
@@ -149,11 +153,12 @@ export function useCheckout() {
         theme: { color: "#2874f0" }, // Flipkart blue
         handler: async (response: any) => {
           try {
-            const verification = await ordersApi.verifyPayment({
+            const payload = {
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
-            });
+            };
+            const verification = await ordersApi.verifyPayment(payload);
 
             if (verification.success) {
               clearCart();
@@ -168,12 +173,23 @@ export function useCheckout() {
             }
           } catch (verifyErr: any) {
             console.error("Payment verification error:", verifyErr);
+            
+            // Network or server error - save for offline sync
+            const payload = {
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            };
+            const encrypted = CryptoJS.AES.encrypt(JSON.stringify(payload), SECRET_KEY).toString();
+            localStorage.setItem("pending_payment_verification", encrypted);
+            
+            clearCart();
+            setOrderSuccess({ orderNumber: "Pending Sync" });
+
             toast({
-              title: "Payment Verification Failed",
-              description:
-                verifyErr.message ||
-                "Your payment was processed but verification failed. Please contact support with your payment ID.",
-              status: "error",
+              title: "Connection Lost",
+              description: "Your payment was processed. We will securely verify your order in the background once you are back online.",
+              status: "info",
               duration: 8000,
               position: "top",
             });

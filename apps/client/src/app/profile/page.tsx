@@ -76,8 +76,7 @@ export default function ProfilePage() {
   const fetchOrders = async () => {
     setLoadingOrders(true);
     try {
-      // Assuming list() returns orders for the logged-in user if not admin
-      const data = await ordersApi.list();
+      const data = await ordersApi.userOrders();
       setOrders(data);
     } catch (error) {
       console.error("Error fetching orders", error);
@@ -165,7 +164,9 @@ export default function ProfilePage() {
                   mb={4}
                 >
                   <User size={36} />
-                  <Badge borderRadius={'xl'} colorScheme="purple">{user.role}</Badge>
+                  <Badge borderRadius={"xl"} colorScheme="purple">
+                    {user.role}
+                  </Badge>
                 </Box>
                 <Box w="full" ml={4}>
                   <Heading size="sm" mb={1}>

@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import { promotionsApi } from "../lib/api";
 
 export function UtmTracker() {
   const searchParams = useSearchParams();
+  const trackedRef = useRef(false);
 
   useEffect(() => {
     if (!searchParams) return;
@@ -22,6 +24,12 @@ export function UtmTracker() {
         hasTrackingParams = true;
       }
     });
+
+    const utmMediaVal = searchParams.get("utmmedia");
+    if (utmMediaVal && !trackedRef.current) {
+      trackedRef.current = true;
+      promotionsApi.track(utmMediaVal).catch((e) => console.error("Failed to track promotion", e));
+    }
 
     // Save tracking params to localStorage to persist across sessions/login
     if (hasTrackingParams) {

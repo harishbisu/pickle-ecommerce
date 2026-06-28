@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.issues = exports.reviews = exports.appSettings = exports.discounts = exports.orderItems = exports.orders = exports.products = exports.users = void 0;
+exports.promotionalVisits = exports.issues = exports.reviews = exports.appSettings = exports.discounts = exports.orderItems = exports.orders = exports.products = exports.users = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 exports.users = (0, pg_core_1.pgTable)('users', {
     id: (0, pg_core_1.uuid)('id').defaultRandom().primaryKey(),
@@ -90,6 +90,14 @@ exports.issues = (0, pg_core_1.pgTable)('issues', {
     subject: (0, pg_core_1.text)('subject').notNull(),
     description: (0, pg_core_1.text)('description').notNull(),
     status: (0, pg_core_1.text)('status').notNull().default('OPEN'),
+    createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow(),
+    updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow(),
+});
+exports.promotionalVisits = (0, pg_core_1.pgTable)('promotional_visits', {
+    id: (0, pg_core_1.uuid)('id').defaultRandom().primaryKey(),
+    utmSource: (0, pg_core_1.text)('utm_source').notNull().unique(),
+    visitCount: (0, pg_core_1.integer)('visit_count').notNull().default(0),
+    url: (0, pg_core_1.text)('url'),
     createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow(),
     updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow(),
 });

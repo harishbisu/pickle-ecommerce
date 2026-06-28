@@ -4,17 +4,20 @@ import { useEffect, useState } from "react";
 import { SimpleGrid, Spinner, Center, Text } from "@chakra-ui/react";
 import { IndianRupee, ShoppingBag, TrendingUp, Users } from "lucide-react";
 import { StatCard } from "../../components/admin/StatCard";
-import { ordersApi, Order } from "@/lib/api";
+import { analyticsApi } from "@/lib/api";
 
 export default function DashboardOverview() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [dashboardStats, setDasboardStats] = useState<{
+    totalUsers: number;
+    totalOrders: number;
+    totalRevenue: number;
+  }>();
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const data = await ordersApi.list();
-        setOrders(data);
+        const data = await analyticsApi.dashboardData();
+        setDasboardStats(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -32,11 +35,9 @@ export default function DashboardOverview() {
     );
   }
 
-  const totalRevenue = orders.reduce(
-    (acc, order) => acc + parseFloat(order.totalAmount),
-    0,
-  );
-  const totalOrders = orders.length;
+  const totalRevenue = dashboardStats?.totalRevenue || 0;
+  const totalOrders = dashboardStats?.totalOrders || 0;
+  const totalUsers = dashboardStats?.totalUsers || 0;
 
   return (
     <>
@@ -46,7 +47,7 @@ export default function DashboardOverview() {
       <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
         <StatCard
           label="Total Revenue"
-          value={`₹${totalRevenue.toFixed(2)}`}
+          value={`₹${Math.round(totalRevenue)}`}
           icon={IndianRupee}
           color="#0d9488"
           bg="#ccfbf1"
@@ -62,15 +63,15 @@ export default function DashboardOverview() {
         />
         <StatCard
           label="Conversion Rate"
-          value="4.2%"
+          value=""
           icon={TrendingUp}
           color="#ea580c"
           bg="#ffedd5"
-          help="+0.8% from last month"
+          help="% from last month"
         />
         <StatCard
-          label="Active Users"
-          value="1,249"
+          label="Total Users"
+          value={totalUsers}
           icon={Users}
           color="#9333ea"
           bg="#f3e8ff"

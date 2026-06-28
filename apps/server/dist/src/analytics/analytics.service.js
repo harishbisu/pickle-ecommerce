@@ -13,11 +13,18 @@ const schema_1 = require("../db/schema");
 const drizzle_orm_1 = require("drizzle-orm");
 let AnalyticsService = class AnalyticsService {
     async getDashboardMetrics() {
-        const totalUsersResult = await db_1.db.select({ count: (0, drizzle_orm_1.sql) `count(*)` }).from(schema_1.users);
-        const totalOrdersResult = await db_1.db.select({ count: (0, drizzle_orm_1.sql) `count(*)` }).from(schema_1.orders);
-        const totalRevenueResult = await db_1.db.select({
-            total: (0, drizzle_orm_1.sql) `sum(CAST(${schema_1.orders.totalAmount} AS DECIMAL))`
-        }).from(schema_1.orders).where((0, drizzle_orm_1.sql) `${schema_1.orders.status} != 'CANCELLED'`);
+        const totalUsersResult = await db_1.db
+            .select({ count: (0, drizzle_orm_1.sql) `count(*)` })
+            .from(schema_1.users);
+        const totalOrdersResult = await db_1.db
+            .select({ count: (0, drizzle_orm_1.sql) `count(*)` })
+            .from(schema_1.orders);
+        const totalRevenueResult = await db_1.db
+            .select({
+            total: (0, drizzle_orm_1.sql) `sum(CAST(${schema_1.orders.totalAmount} AS DECIMAL))`,
+        })
+            .from(schema_1.orders)
+            .where((0, drizzle_orm_1.sql) `${schema_1.orders.status} != 'CANCELLED' and ${schema_1.orders.status} != 'ACKNOWLEGED'`);
         return {
             totalUsers: totalUsersResult[0].count,
             totalOrders: totalOrdersResult[0].count,

@@ -61,6 +61,14 @@ export const authApi = {
     }>("/auth/profile"),
 };
 
+// ─── Analytics API ──────────────────────────────────────────────────────────────
+export const analyticsApi = {
+  dashboardData: () =>
+    api.get<{ totalUsers: number; totalOrders: number; totalRevenue: number }>(
+      "/analytics/dashboard",
+    ),
+};
+
 // ─── Users API ──────────────────────────────────────────────────────────────
 export const usersApi = {
   updateProfile: (data: {
@@ -69,6 +77,7 @@ export const usersApi = {
     state?: string;
     phone?: string;
   }) => api.patch<{ id: string; email: string }>("/users/profile", data),
+  list: () => api.get<User[]>("/users"),
 };
 
 // ─── Products API ────────────────────────────────────────────────────────────
@@ -122,9 +131,28 @@ export const ordersApi = {
       data,
     ),
   track: (id: string) => api.get<Order>(`/orders/track/${id}`),
-  list: () => api.get<Order[]>("/orders"),
+  list: (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    date?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.append("page", params.page.toString());
+    if (params?.limit) query.append("limit", params.limit.toString());
+    if (params?.status) query.append("status", params.status);
+    if (params?.date) query.append("date", params.date);
+    return api.get<{
+      data: Order[];
+      total: number;
+      hasMore: boolean;
+      page: number;
+      limit: number;
+    }>(`/orders?${query.toString()}`);
+  },
   updateStatus: (id: string, status: string) =>
     api.patch<Order>(`/orders/${id}/status`, { status }),
+  userOrders: () => api.get<Order[]>("/orders/user/my-orders"),
 };
 
 // ─── Settings API ─────────────────────────────────────────────────────────────
@@ -134,6 +162,15 @@ export const settingsApi = {
     api.get<{ key: string; value: string }>(`/settings/${key}`),
   set: (key: string, value: string) =>
     api.post<AppSetting>("/settings", { key, value }),
+};
+
+// ─── Promotions API ───────────────────────────────────────────────────────────
+export const promotionsApi = {
+  list: () => api.get<Promotion[]>("/promotions"),
+  create: (data: { utmSource: string }) =>
+    api.post<Promotion>("/promotions", data),
+  track: (utmSource: string) =>
+    api.post<{ success: boolean }>("/promotions/track", { utmSource }),
 };
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -188,4 +225,19 @@ export interface AppSetting {
   id: string;
   settingKey: string;
   settingValue: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  role: string;
+  name?: string;
+  createdAt: string;
+}
+
+export interface Promotion {
+  id: string;
+  utmSource: string;
+  visitCount: number;
+  createdAt: string;
 }

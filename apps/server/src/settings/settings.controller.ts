@@ -31,4 +31,24 @@ export class SettingsController {
   async setSetting(@Body() body: SetSettingDto) {
     return this.settingsService.setSetting(body.key, body.value);
   }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
+  @Post('promotions')
+  async createPromotion(@Body('utmSource') utmSource: string) {
+    return this.settingsService.createPromotionalUrl(utmSource);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
+  @Get('promotions/visits')
+  async getPromotions() {
+    return this.settingsService.getPromotionalVisits();
+  }
+
+  @Post('promotions/track')
+  async trackPromotion(@Body('utmSource') utmSource: string) {
+    await this.settingsService.trackVisit(utmSource);
+    return { success: true };
+  }
 }
