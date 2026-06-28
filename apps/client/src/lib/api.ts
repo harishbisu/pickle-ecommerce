@@ -50,7 +50,25 @@ export const authApi = {
       password,
     }),
   profile: () =>
-    api.get<{ id: number; email: string; role: string }>("/auth/profile"),
+    api.get<{
+      id: string;
+      email: string;
+      role: string;
+      name?: string;
+      phone?: string;
+      address?: string;
+      state?: string;
+    }>("/auth/profile"),
+};
+
+// ─── Users API ──────────────────────────────────────────────────────────────
+export const usersApi = {
+  updateProfile: (data: {
+    name?: string;
+    address?: string;
+    state?: string;
+    phone?: string;
+  }) => api.patch<{ id: string; email: string }>("/users/profile", data),
 };
 
 // ─── Products API ────────────────────────────────────────────────────────────
@@ -79,19 +97,27 @@ export const productsApi = {
 
 // ─── Orders API ──────────────────────────────────────────────────────────────
 export const ordersApi = {
-  checkout: (items: CartItem[]) =>
+  checkout: (
+    items: CartItem[],
+    shippingDetails?: {
+      shippingName: string;
+      shippingAddress: string;
+      shippingState: string;
+      shippingPhone: string;
+    },
+  ) =>
     api.post<{
       id: string;
       razorpayOrderId: string;
       razorpayKeyId: string;
       totalAmount: string;
-    }>("/orders/checkout", { items }),
+    }>("/orders/checkout", { items, ...shippingDetails }),
   verifyPayment: (data: {
     razorpayOrderId: string;
     razorpayPaymentId: string;
     razorpaySignature: string;
   }) =>
-    api.post<{ success: boolean; orderId: string }>(
+    api.post<{ success: boolean; orderId: string; orderNumber: string }>(
       "/orders/verify-payment",
       data,
     ),
@@ -135,12 +161,17 @@ export interface CartItem {
 
 export interface Order {
   id: string;
+  orderNumber: string;
   userId: string;
   totalAmount: string;
   status: string;
   paymentId: string;
   trackingId: string | null;
   createdAt: string;
+  shippingName?: string;
+  shippingAddress?: string;
+  shippingState?: string;
+  shippingPhone?: string;
   items?: OrderItem[];
 }
 
@@ -150,6 +181,7 @@ export interface OrderItem {
   productId: string;
   quantity: number;
   price: string;
+  productName?: string;
 }
 
 export interface AppSetting {

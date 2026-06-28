@@ -89,6 +89,8 @@ export default function ProductDetailsPage() {
       name: product.name,
       price: parseFloat(product.price),
       image: product.images?.[0] || "",
+      discount: product.discount,
+      slug: product.slug, 
     });
     toast({
       title: "Added to cart!",
@@ -103,9 +105,9 @@ export default function ProductDetailsPage() {
     ? product.images
     : ["https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=800"];
   const discountAmount = product.discount ? parseFloat(product.discount) : 0;
-  const originalPrice = Math.round(parseFloat(product.price) + discountAmount); // Mocking original price based on discount or markup
+  const priceAfterDiscount = parseFloat(product.price) - discountAmount;
   const discountPercent =
-    discountAmount > 0 ? Math.round((discountAmount / originalPrice) * 100) : 0;
+    discountAmount > 0 ? Math.round((discountAmount / parseFloat(product.price)) * 100) : 0;
 
   return (
     <Box minH="100vh" bg="surface.50">
@@ -231,7 +233,7 @@ export default function ProductDetailsPage() {
               <Box>
                 <HStack align="baseline" spacing={3}>
                   <Text fontSize="3xl" fontWeight="bold" color="surface.900">
-                    ₹{product.price}
+                    ₹{priceAfterDiscount.toFixed(2)}
                   </Text>
                   {discountPercent > 0 && (
                     <>
@@ -240,7 +242,7 @@ export default function ProductDetailsPage() {
                         color="surface.400"
                         textDecoration="line-through"
                       >
-                        ₹{originalPrice}
+                        ₹{parseFloat(product.price).toFixed(2)}
                       </Text>
                       <Text fontSize="md" color="green.500" fontWeight="bold">
                         {discountPercent}% off

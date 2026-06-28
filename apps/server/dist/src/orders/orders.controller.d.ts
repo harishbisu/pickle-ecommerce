@@ -6,6 +6,10 @@ export declare class OrdersController {
     checkout(req: any, body: CheckoutDto): Promise<{
         razorpayOrderId: string;
         razorpayKeyId: string | undefined;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
         id: string;
         createdAt: Date | null;
         updatedAt: Date | null;
@@ -18,7 +22,7 @@ export declare class OrdersController {
     }>;
     verifyPayment(body: VerifyPaymentDto): Promise<{
         success: boolean;
-        orderId: string | undefined;
+        orderNumber: string | undefined;
     }>;
     trackPublic(orderNumber: string, req: any): Promise<{
         orderNumber: string;
@@ -39,6 +43,10 @@ export declare class OrdersController {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
         message?: undefined;
@@ -51,6 +59,10 @@ export declare class OrdersController {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;
@@ -63,6 +75,10 @@ export declare class OrdersController {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
     }[]>;

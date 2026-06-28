@@ -24,4 +24,9 @@ export class UsersService {
     }).returning();
     return result[0];
   }
+
+  async updateProfile(id: string, data: { name?: string; address?: string; state?: string; phone?: string }) {
+    const result = await db.update(users).set(data).where(eq(users.id, id)).returning();
+    return result[0];
+  }
 }

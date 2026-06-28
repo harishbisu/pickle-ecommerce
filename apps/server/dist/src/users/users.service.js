@@ -28,6 +28,10 @@ let UsersService = class UsersService {
         }).returning();
         return result[0];
     }
+    async updateProfile(id, data) {
+        const result = await db_1.db.update(schema_1.users).set(data).where((0, drizzle_orm_1.eq)(schema_1.users.id, id)).returning();
+        return result[0];
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

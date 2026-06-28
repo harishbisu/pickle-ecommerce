@@ -16,12 +16,19 @@ const products_module_1 = require("./products/products.module");
 const settings_module_1 = require("./settings/settings.module");
 const orders_module_1 = require("./orders/orders.module");
 const analytics_module_1 = require("./analytics/analytics.module");
+const throttler_1 = require("@nestjs/throttler");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [users_module_1.UsersModule, auth_module_1.AuthModule, products_module_1.ProductsModule, settings_module_1.SettingsModule, orders_module_1.OrdersModule, analytics_module_1.AnalyticsModule],
+        imports: [
+            throttler_1.ThrottlerModule.forRoot([{
+                    ttl: 60000,
+                    limit: 10,
+                }]),
+            users_module_1.UsersModule, auth_module_1.AuthModule, products_module_1.ProductsModule, settings_module_1.SettingsModule, orders_module_1.OrdersModule, analytics_module_1.AnalyticsModule
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

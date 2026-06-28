@@ -4,6 +4,10 @@ export declare class OrderItemDto {
 }
 export declare class CheckoutDto {
     items: OrderItemDto[];
+    shippingName: string;
+    shippingAddress: string;
+    shippingState: string;
+    shippingPhone: string;
 }
 export declare class VerifyPaymentDto {
     razorpayOrderId: string;

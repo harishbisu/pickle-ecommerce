@@ -71,14 +71,14 @@ export default function CheckoutPage() {
               Order Placed!
             </Heading>
             <Text color="surface.500" fontSize="15px" maxW="400px">
-              Your payment was verified and order #{orderSuccess.orderId} has
-              been confirmed. We'll send updates as your order is prepared.
+              Your payment was verified and order #{orderSuccess.orderNumber}{" "}
+              has been confirmed. We'll send updates as your order is prepared.
             </Text>
             <HStack spacing={4}>
               <Button
                 id="track-order-btn"
                 as={NextLink}
-                href={`/track?id=${orderSuccess.orderId}`}
+                href={`/track?id=${orderSuccess.orderNumber}`}
                 size="lg"
                 borderRadius="24px"
                 bg="#2874f0" // Flipkart Blue
@@ -271,6 +271,24 @@ export default function CheckoutPage() {
                       value={address.city}
                       onChange={(e) =>
                         setAddress((a) => ({ ...a, city: e.target.value }))
+                      }
+                      focusBorderColor="#2874f0"
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel
+                      fontSize="13px"
+                      fontWeight="600"
+                      color="surface.700"
+                    >
+                      State
+                    </FormLabel>
+                    <Input
+                      id="checkout-state"
+                      placeholder="Karnataka"
+                      value={address.state}
+                      onChange={(e) =>
+                        setAddress((a) => ({ ...a, state: e.target.value }))
                       }
                       focusBorderColor="#2874f0"
                     />

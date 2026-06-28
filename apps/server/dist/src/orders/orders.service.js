@@ -55,44 +55,80 @@ const razorpay = new razorpay_1.default({
     key_id: process.env.RAZORPAY_KEY_ID || '',
     key_secret: process.env.RAZORPAY_KEY_SECRET || '',
 });
+async function orderIdExists(orderNumber) {
+    const existing = await db_1.db.query.orders.findFirst({
+        where: (0, drizzle_orm_1.eq)(schema_1.orders.orderNumber, orderNumber),
+        columns: {
+            id: true,
+        },
+    });
+    return !!existing;
+}
 let OrdersService = class OrdersService {
-    async createOrder(userId, items) {
+    async createOrder(userId, items, shippingDetails) {
         if (!items || items.length === 0) {
             throw new common_1.BadRequestException('Order must contain at least one item');
         }
-        const productIds = items.map(i => i.productId);
-        const dbProducts = await db_1.db.select().from(schema_1.products).where((0, drizzle_orm_1.inArray)(schema_1.products.id, productIds));
+        const productIds = items.map((i) => i.productId);
+        const dbProducts = await db_1.db
+            .select()
+            .from(schema_1.products)
+            .where((0, drizzle_orm_1.inArray)(schema_1.products.id, productIds));
         if (dbProducts.length !== productIds.length) {
             throw new common_1.BadRequestException('One or more products are invalid');
         }
         let totalAmount = 0;
-        const finalItems = items.map(item => {
-            const p = dbProducts.find(prod => prod.id === item.productId);
+        const finalItems = items.map((item) => {
+            const p = dbProducts.find((prod) => prod.id === item.productId);
             if (!p)
                 throw new common_1.BadRequestException('Product not found');
+            if (p.stock < item.quantity) {
+                throw new common_1.NotFoundException(`Insufficient stock for "${p.name}".`);
+            }
             let price = parseFloat(p.price);
             if (p.discount && parseFloat(p.discount) > 0) {
-                price = price - (price * (parseFloat(p.discount) / 100));
+                price = price - parseFloat(p.discount);
                 price = Math.max(price, 0);
             }
             totalAmount += price * item.quantity;
-            return { productId: item.productId, quantity: item.quantity, price: price.toString() };
+            return {
+                productId: item.productId,
+                quantity: item.quantity,
+                price: price.toString(),
+            };
         });
         const minOrderSetting = await db_1.db
             .select()
             .from(schema_1.appSettings)
             .where((0, drizzle_orm_1.eq)(schema_1.appSettings.settingKey, 'MIN_ORDER_PRICE'))
             .limit(1);
-        const minOrderPrice = minOrderSetting[0]?.settingValue ? parseFloat(minOrderSetting[0].settingValue) : 0;
+        const minOrderPrice = minOrderSetting[0]?.settingValue
+            ? parseFloat(minOrderSetting[0].settingValue)
+            : 0;
         if (totalAmount < minOrderPrice) {
             throw new common_1.BadRequestException(`Minimum order amount is ₹${minOrderPrice}`);
         }
-        const orderNumber = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+        let orderNumber;
+        do {
+            orderNumber =
+                'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+        } while (await orderIdExists(orderNumber));
         const rpOrder = await razorpay.orders.create({
             amount: Math.round(totalAmount * 100),
             currency: 'INR',
             receipt: orderNumber,
         });
+        if (shippingDetails) {
+            await db_1.db
+                .update(schema_1.users)
+                .set({
+                name: shippingDetails.shippingName,
+                address: shippingDetails.shippingAddress,
+                state: shippingDetails.shippingState,
+                phone: shippingDetails.shippingPhone,
+            })
+                .where((0, drizzle_orm_1.eq)(schema_1.users.id, userId));
+        }
         const dbOrder = await db_1.db
             .insert(schema_1.orders)
             .values({
@@ -101,6 +137,10 @@ let OrdersService = class OrdersService {
             totalAmount: totalAmount.toString(),
             status: 'ACKNOWLEDGED',
             paymentId: rpOrder.id,
+            shippingName: shippingDetails?.shippingName,
+            shippingAddress: shippingDetails?.shippingAddress,
+            shippingState: shippingDetails?.shippingState,
+            shippingPhone: shippingDetails?.shippingPhone,
         })
             .returning();
         for (const item of finalItems) {
@@ -122,7 +162,10 @@ let OrdersService = class OrdersService {
         if (!secret)
             throw new common_1.BadRequestException('Payment gateway not configured');
         const body = razorpayOrderId + '|' + razorpayPaymentId;
-        const expectedSignature = crypto.createHmac('sha256', secret).update(body).digest('hex');
+        const expectedSignature = crypto
+            .createHmac('sha256', secret)
+            .update(body)
+            .digest('hex');
         let isValid = false;
         try {
             isValid = crypto.timingSafeEqual(Buffer.from(expectedSignature, 'hex'), Buffer.from(razorpaySignature, 'hex'));
@@ -132,20 +175,28 @@ let OrdersService = class OrdersService {
         }
         if (!isValid)
             return { valid: false };
-        const existingOrder = await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.paymentId, razorpayOrderId)).limit(1);
+        const existingOrder = await db_1.db
+            .select()
+            .from(schema_1.orders)
+            .where((0, drizzle_orm_1.eq)(schema_1.orders.paymentId, razorpayOrderId))
+            .limit(1);
         if (!existingOrder.length)
             return { valid: false };
         if (existingOrder[0].status === 'PAID')
-            return { valid: true, orderId: existingOrder[0].id };
+            return { valid: true, orderNumber: existingOrder[0].orderNumber };
         const orderResult = await db_1.db
             .update(schema_1.orders)
             .set({ status: 'PAID', paymentId: razorpayPaymentId })
             .where((0, drizzle_orm_1.eq)(schema_1.orders.paymentId, razorpayOrderId))
             .returning();
-        return { valid: true, orderId: orderResult[0]?.id };
+        return { valid: true, orderNumber: orderResult[0]?.orderNumber };
     }
     async trackOrder(orderNumber, userId) {
-        const order = await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.orderNumber, orderNumber)).limit(1);
+        const order = await db_1.db
+            .select()
+            .from(schema_1.orders)
+            .where((0, drizzle_orm_1.eq)(schema_1.orders.orderNumber, orderNumber))
+            .limit(1);
         if (!order.length) {
             throw new common_1.NotFoundException('Order not found');
         }
@@ -153,18 +204,33 @@ let OrdersService = class OrdersService {
             return {
                 orderNumber: order[0].orderNumber,
                 status: order[0].status,
-                message: 'Detailed tracking is only available to the order owner.'
+                message: 'Detailed tracking is only available to the order owner.',
             };
         }
-        const items = await db_1.db.select().from(schema_1.orderItems).where((0, drizzle_orm_1.eq)(schema_1.orderItems.orderId, order[0].id));
+        const items = await db_1.db
+            .select()
+            .from(schema_1.orderItems)
+            .where((0, drizzle_orm_1.eq)(schema_1.orderItems.orderId, order[0].id));
         return { ...order[0], items };
     }
     async updateStatus(id, status) {
-        const validStatuses = ['ACKNOWLEDGED', 'PAID', 'DISPATCHED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'];
+        const validStatuses = [
+            'ACKNOWLEDGED',
+            'PAID',
+            'DISPATCHED',
+            'IN_TRANSIT',
+            'OUT_FOR_DELIVERY',
+            'DELIVERED',
+            'CANCELLED',
+        ];
         if (!validStatuses.includes(status)) {
             throw new common_1.BadRequestException(`Invalid status. Allowed statuses: ${validStatuses.join(', ')}`);
         }
-        const result = await db_1.db.update(schema_1.orders).set({ status }).where((0, drizzle_orm_1.eq)(schema_1.orders.id, id)).returning();
+        const result = await db_1.db
+            .update(schema_1.orders)
+            .set({ status })
+            .where((0, drizzle_orm_1.eq)(schema_1.orders.id, id))
+            .returning();
         if (!result.length)
             throw new common_1.NotFoundException('Order not found');
         return result[0];
@@ -172,7 +238,23 @@ let OrdersService = class OrdersService {
     async findAll(statusFilter, dateFilter) {
         let query = db_1.db.select().from(schema_1.orders).orderBy((0, drizzle_orm_1.desc)(schema_1.orders.createdAt));
         const allOrders = await query;
-        return allOrders.filter((o) => {
+        const orderIds = allOrders.map((o) => o.id);
+        let allItems = [];
+        if (orderIds.length > 0) {
+            allItems = await db_1.db
+                .select({
+                id: schema_1.orderItems.id,
+                orderId: schema_1.orderItems.orderId,
+                productId: schema_1.orderItems.productId,
+                quantity: schema_1.orderItems.quantity,
+                price: schema_1.orderItems.price,
+                productName: schema_1.products.name,
+            })
+                .from(schema_1.orderItems)
+                .leftJoin(schema_1.products, (0, drizzle_orm_1.eq)(schema_1.orderItems.productId, schema_1.products.id))
+                .where((0, drizzle_orm_1.inArray)(schema_1.orderItems.orderId, orderIds));
+        }
+        const filtered = allOrders.filter((o) => {
             let pass = true;
             if (statusFilter === 'NOT_COMPLETED') {
                 pass = pass && !['DELIVERED', 'CANCELLED'].includes(o.status);
@@ -190,9 +272,17 @@ let OrdersService = class OrdersService {
             }
             return pass;
         });
+        return filtered.map((order) => ({
+            ...order,
+            items: allItems.filter((item) => item.orderId === order.id),
+        }));
     }
     async findByUserId(userId) {
-        return await db_1.db.select().from(schema_1.orders).where((0, drizzle_orm_1.eq)(schema_1.orders.userId, userId)).orderBy((0, drizzle_orm_1.desc)(schema_1.orders.createdAt));
+        return await db_1.db
+            .select()
+            .from(schema_1.orders)
+            .where((0, drizzle_orm_1.eq)(schema_1.orders.userId, userId))
+            .orderBy((0, drizzle_orm_1.desc)(schema_1.orders.createdAt));
     }
 };
 exports.OrdersService = OrdersService;

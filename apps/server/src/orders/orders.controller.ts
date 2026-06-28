@@ -1,6 +1,7 @@
 import {
   Controller, Post, Get, Patch, Body, Param, UseGuards, Request, HttpCode, HttpStatus, BadRequestException, Query
 } from '@nestjs/common';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { OrdersService } from './orders.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -11,11 +12,17 @@ import { CheckoutDto, VerifyPaymentDto, UpdateOrderStatusDto } from './orders.dt
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('checkout')
   @HttpCode(HttpStatus.CREATED)
   async checkout(@Request() req: any, @Body() body: CheckoutDto) {
-    return this.ordersService.createOrder(req.user.id, body.items);
+    return this.ordersService.createOrder(req.user.id, body.items, {
+      shippingName: body.shippingName,
+      shippingAddress: body.shippingAddress,
+      shippingState: body.shippingState,
+      shippingPhone: body.shippingPhone,
+    });
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -30,7 +37,7 @@ export class OrdersController {
     if (!result.valid) {
       throw new BadRequestException('Payment signature verification failed');
     }
-    return { success: true, orderId: result.orderId };
+    return { success: true, orderNumber: result.orderNumber };
   }
 
   // Allow unauthenticated tracking by orderNumber

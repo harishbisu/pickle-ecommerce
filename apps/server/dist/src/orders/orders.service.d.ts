@@ -2,7 +2,12 @@ export declare class OrdersService {
     createOrder(userId: string, items: {
         productId: string;
         quantity: number;
-    }[]): Promise<{
+    }[], shippingDetails?: {
+        shippingName?: string;
+        shippingAddress?: string;
+        shippingState?: string;
+        shippingPhone?: string;
+    }): Promise<{
         razorpayOrderId: string;
         razorpayKeyId: string | undefined;
         id: string;
@@ -14,10 +19,14 @@ export declare class OrdersService {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
     }>;
     verifyPayment(razorpayOrderId: string, razorpayPaymentId: string, razorpaySignature: string): Promise<{
         valid: boolean;
-        orderId?: string;
+        orderNumber?: string;
     }>;
     trackOrder(orderNumber: string, userId?: string): Promise<{
         orderNumber: string;
@@ -38,6 +47,10 @@ export declare class OrdersService {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
         message?: undefined;
@@ -50,6 +63,10 @@ export declare class OrdersService {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
     }>;
@@ -62,6 +79,10 @@ export declare class OrdersService {
         status: string;
         paymentId: string | null;
         trackingId: string | null;
+        shippingName: string | null;
+        shippingAddress: string | null;
+        shippingState: string | null;
+        shippingPhone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;
     }[]>;

@@ -14,6 +14,18 @@ export class CheckoutDto {
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items!: OrderItemDto[];
+
+  @IsString({ message: 'Shipping name must be a string' })
+  shippingName!: string;
+
+  @IsString({ message: 'Shipping address must be a string' })
+  shippingAddress!: string;
+
+  @IsString({ message: 'Shipping state must be a string' })
+  shippingState!: string;
+
+  @IsString({ message: 'Shipping phone must be a string' })
+  shippingPhone!: string;
 }
 
 export class VerifyPaymentDto {

@@ -8,10 +8,12 @@ export declare class AuthController {
     }>;
     register(body: RegisterDto): Promise<{
         id: string;
+        name: string | null;
         email: string;
         googleId: string | null;
         role: string;
         address: string | null;
+        state: string | null;
         phone: string | null;
         createdAt: Date | null;
         updatedAt: Date | null;

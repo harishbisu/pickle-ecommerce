@@ -82,10 +82,13 @@ export default function Home() {
   }, []);
 
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
     e.stopPropagation();
     addItem({
       productId: product.id,
       name: product.name,
+      discount: product.discount,
+      slug: product.slug,
       price: parseFloat(product.price),
       image: product.images?.[0] || "",
     });
@@ -426,7 +429,9 @@ export default function Home() {
                           fontSize="lg"
                           color="surface.900"
                         >
-                          ₹{product.price}
+                          ₹
+                          {parseFloat(product.price) -
+                            parseFloat(product.discount || "0")}
                         </Text>
                         {parseFloat(product.discount || "0") && (
                           <Text
@@ -434,19 +439,18 @@ export default function Home() {
                             color="surface.400"
                             textDecoration="line-through"
                           >
-                            ₹
-                            {Math.round(
-                              parseFloat(product.price) -
-                                (parseFloat(product.discount || "0") *
-                                  parseFloat(product.price)) /
-                                  100,
-                            )}
+                            ₹{product.price}
                           </Text>
                         )}
                       </HStack>
-                      {product.discount && (
+                      {parseFloat(product.discount || "") != 0 && (
                         <Badge colorScheme="green" fontSize="11px">
-                          {parseFloat(product.discount || "0")}% off
+                          {(
+                            (parseFloat(product.discount || "0") /
+                              parseFloat(product.price)) *
+                            100
+                          ).toFixed(0)}
+                          % off
                         </Badge>
                       )}
                     </Flex>

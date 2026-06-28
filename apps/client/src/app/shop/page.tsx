@@ -79,7 +79,7 @@ function ProductCard({
 
   const rating = RATINGS[idx % RATINGS.length];
   const reviews = REVIEW_COUNTS[idx % REVIEW_COUNTS.length];
-  const discount = parseFloat(product.discount || "0").toFixed(0);
+  const discount = parseFloat(product.discount || "0");
 
   return (
     <Card
@@ -113,7 +113,7 @@ function ProductCard({
         />
 
         {/* Discount badge */}
-        {discount != "0" && (
+        {discount != 0 && (
           <Badge
             position="absolute"
             top={2.5}
@@ -126,7 +126,8 @@ function ProductCard({
             px={2}
             py={0.5}
           >
-            {discount}% OFF
+            {Math.round((discount / parseFloat(product.price || "0")) * 100)}%
+            OFF
           </Badge>
         )}
 
@@ -214,13 +215,9 @@ function ProductCard({
               <Box>
                 <HStack spacing={1.5} align="baseline">
                   <Text fontWeight="800" fontSize="18px" color="surface.900">
-                    ₹
-                    {Math.round(
-                      parseFloat(product.price) *
-                        parseFloat((1 - parseFloat(discount) / 100).toFixed(2)),
-                    )}
+                    ₹{Math.round(parseFloat(product.price || "0") - discount)}
                   </Text>
-                  {discount != "0" && (
+                  {discount != 0 && (
                     <Text
                       fontWeight="400"
                       fontSize="12px"
@@ -334,8 +331,8 @@ export default function ShopPage() {
       {/* ── Hero Banner ──────────────────────────────────────────────── */}
       <Box
         bgGradient="linear(135deg, brand.700 0%, brand.500 50%, #4285f4 100%)"
-        py={{ base: 10, md: 14 }}
-        px={6}
+        py={{ base: 4, md: 14 }}
+        px={{ base: 4, md: 6 }}
         position="relative"
         overflow="hidden"
       >
@@ -359,14 +356,14 @@ export default function ShopPage() {
           bg="whiteAlpha.100"
         />
 
-        <Container maxW="1280px">
+        <Container maxW="1280px" p={0}>
           <Flex
             direction={{ base: "column", md: "row" }}
-            align="center"
+            align="left"
             justify="space-between"
             gap={6}
           >
-            <Box>
+            <Box p={0}>
               <Badge
                 bg="whiteAlpha.300"
                 color="white"
@@ -430,7 +427,7 @@ export default function ShopPage() {
         </Container>
       </Box>
 
-      <Container maxW="1280px" px={6} py={8}>
+      <Container maxW="1280px" px={{ base: 4, md: 6 }} py={{ base: 4, md: 8 }}>
         {/* ── Category Chips ─────────────────────────────────────── */}
         <Text fontSize="14px" color="surface.500" mb={2}>
           Browse by category

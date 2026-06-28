@@ -1,14 +1,16 @@
 export interface User {
   id: string;
   email: string;
-  role: 'USER' | 'ADMIN';
+  name?: string;
+  role: "USER" | "ADMIN";
   address?: string;
+  state?: string;
   phone?: string;
   createdAt?: string;
 }
 
 export interface Product {
-  id: string; 
+  id: string;
   slug: string;
   name: string;
   description: string;
@@ -41,13 +43,13 @@ export interface Order {
   items?: OrderItem[];
 }
 
-export type OrderStatus = 
-  | 'ACKNOWLEDGED' 
-  | 'DISPATCHED' 
-  | 'IN_TRANSIT' 
-  | 'OUT_FOR_DELIVERY' 
-  | 'DELIVERED'
-  | 'CANCELLED';
+export type OrderStatus =
+  | "ACKNOWLEDGED"
+  | "DISPATCHED"
+  | "IN_TRANSIT"
+  | "OUT_FOR_DELIVERY"
+  | "DELIVERED"
+  | "CANCELLED";
 
 export interface OrderItem {
   id: string;

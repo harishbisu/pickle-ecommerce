@@ -94,6 +94,8 @@ export function ProductFormModal({
       e.price = "Enter a valid price";
     if (isNaN(Number(form.stock)) || Number(form.stock) < 0)
       e.stock = "Stock must be 0 or greater";
+    if (isNaN(Number(form.discount)) || Number(form.discount) < 0)
+      e.discount = "Discount must be 0 or greater";
     return e;
   };
 
@@ -123,7 +125,7 @@ export function ProductFormModal({
         description: form.description.trim(),
         price: Number(form.price),
         stock: Number(form.stock),
-        discount: form.discount ? form.discount : null,
+        discount: form.discount ? Number(form.discount) : null,
         isFeatured: form.isFeatured,
         specifications: parsedSpecs,
         images: form.images
@@ -185,16 +187,18 @@ export function ProductFormModal({
         <ModalBody py={6}>
           <VStack spacing={4} align="stretch">
             <HStack spacing={4} align="start">
-              <FormControl isInvalid={!!errors.name} flex={1}>
-                <FormLabel fontSize="13px" fontWeight="600" color="surface.700">
+              <FormControl isInvalid={!!errors.name} flex={1} variant="floating">
+                <FormLabel fontSize="12px" fontWeight="600" color="surface.600" textTransform="uppercase" letterSpacing="0.5px">
                   Product Name *
                 </FormLabel>
                 <Input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g. Spicy Mango Pickle"
-                  size="sm"
-                  borderRadius="8px"
+                  size="md"
+                  borderRadius="10px"
+                  variant="filled"
+                  _focus={{ bg: "white", borderColor: "brand.500" }}
                 />
                 <FormErrorMessage fontSize="12px">
                   {errors.name}
@@ -202,21 +206,23 @@ export function ProductFormModal({
               </FormControl>
 
               <FormControl flex={1}>
-                <FormLabel fontSize="13px" fontWeight="600" color="surface.700">
+                <FormLabel fontSize="12px" fontWeight="600" color="surface.600" textTransform="uppercase" letterSpacing="0.5px">
                   Slug URL
                 </FormLabel>
                 <Input
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value })}
                   placeholder="e.g. spicy-mango"
-                  size="sm"
-                  borderRadius="8px"
+                  size="md"
+                  borderRadius="10px"
+                  variant="filled"
+                  _focus={{ bg: "white", borderColor: "brand.500" }}
                 />
               </FormControl>
             </HStack>
 
             <FormControl isInvalid={!!errors.description}>
-              <FormLabel fontSize="13px" fontWeight="600" color="surface.700">
+              <FormLabel fontSize="12px" fontWeight="600" color="surface.600" textTransform="uppercase" letterSpacing="0.5px">
                 Description *
               </FormLabel>
               <Textarea
@@ -225,8 +231,10 @@ export function ProductFormModal({
                   setForm({ ...form, description: e.target.value })
                 }
                 placeholder="Describe the product..."
-                size="sm"
-                borderRadius="8px"
+                size="md"
+                borderRadius="10px"
+                variant="filled"
+                _focus={{ bg: "white", borderColor: "brand.500" }}
                 rows={3}
                 resize="vertical"
               />
@@ -237,15 +245,17 @@ export function ProductFormModal({
 
             <HStack spacing={4} align="start">
               <FormControl isInvalid={!!errors.price} flex={1}>
-                <FormLabel fontSize="13px" fontWeight="600" color="surface.700">
+                <FormLabel fontSize="12px" fontWeight="600" color="surface.600" textTransform="uppercase" letterSpacing="0.5px">
                   Price (₹) *
                 </FormLabel>
                 <Input
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                   placeholder="199"
-                  size="sm"
-                  borderRadius="8px"
+                  size="md"
+                  borderRadius="10px"
+                  variant="filled"
+                  _focus={{ bg: "white", borderColor: "brand.500" }}
                   type="number"
                   min={0}
                 />
@@ -255,8 +265,8 @@ export function ProductFormModal({
               </FormControl>
 
               <FormControl flex={1}>
-                <FormLabel fontSize="13px" fontWeight="600" color="surface.700">
-                  Discount Amount (₹)
+                <FormLabel fontSize="12px" fontWeight="600" color="surface.600" textTransform="uppercase" letterSpacing="0.5px">
+                  Discount (₹)
                 </FormLabel>
                 <Input
                   value={form.discount}
@@ -264,8 +274,10 @@ export function ProductFormModal({
                     setForm({ ...form, discount: e.target.value })
                   }
                   placeholder="e.g. 50"
-                  size="sm"
-                  borderRadius="8px"
+                  size="md"
+                  borderRadius="10px"
+                  variant="filled"
+                  _focus={{ bg: "white", borderColor: "brand.500" }}
                   type="number"
                   min={0}
                 />

@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersController = void 0;
 const common_1 = require("@nestjs/common");
+const throttler_1 = require("@nestjs/throttler");
 const orders_service_1 = require("./orders.service");
 const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../auth/roles.guard");
@@ -25,14 +26,19 @@ let OrdersController = class OrdersController {
         this.ordersService = ordersService;
     }
     async checkout(req, body) {
-        return this.ordersService.createOrder(req.user.id, body.items);
+        return this.ordersService.createOrder(req.user.id, body.items, {
+            shippingName: body.shippingName,
+            shippingAddress: body.shippingAddress,
+            shippingState: body.shippingState,
+            shippingPhone: body.shippingPhone,
+        });
     }
     async verifyPayment(body) {
         const result = await this.ordersService.verifyPayment(body.razorpayOrderId, body.razorpayPaymentId, body.razorpaySignature);
         if (!result.valid) {
             throw new common_1.BadRequestException('Payment signature verification failed');
         }
-        return { success: true, orderId: result.orderId };
+        return { success: true, orderNumber: result.orderNumber };
     }
     async trackPublic(orderNumber, req) {
         return this.ordersService.trackOrder(orderNumber, req.user?.id);
@@ -49,7 +55,8 @@ let OrdersController = class OrdersController {
 };
 exports.OrdersController = OrdersController;
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), throttler_1.ThrottlerGuard),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
     (0, common_1.Post)('checkout'),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Request)()),

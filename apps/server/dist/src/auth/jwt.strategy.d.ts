@@ -1,5 +1,5 @@
 import { Strategy } from 'passport-jwt';
-declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").StrategyOptionsWithRequest] | [opt: import("passport-jwt").StrategyOptionsWithoutRequest]) => Strategy & {
+declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").StrategyOptionsWithoutRequest] | [opt: import("passport-jwt").StrategyOptionsWithRequest]) => Strategy & {
     validate(...args: any[]): unknown;
 };
 export declare class JwtStrategy extends JwtStrategy_base {
@@ -8,6 +8,10 @@ export declare class JwtStrategy extends JwtStrategy_base {
         id: any;
         email: any;
         role: any;
+        phone: any;
+        name: any;
+        address: any;
+        state: any;
     }>;
 }
 export {};

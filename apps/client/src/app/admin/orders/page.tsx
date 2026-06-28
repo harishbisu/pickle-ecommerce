@@ -1,25 +1,44 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { 
-  Box, Table, Thead, Tbody, Tr, Th, Td, Badge, Select, 
-  Spinner, Center, Text, useToast, Card, CardBody 
-} from '@chakra-ui/react';
-import { ordersApi, Order } from '../../../lib/api';
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Badge,
+  Select,
+  Spinner,
+  Center,
+  Text,
+  useToast,
+  Card,
+  CardBody,
+  VStack,
+} from "@chakra-ui/react";
+import { ordersApi, Order } from "../../../lib/api";
 
 const statusColor: Record<string, string> = {
-  ACKNOWLEDGED: 'blue',
-  PAID: 'green',
-  DISPATCHED: 'orange',
-  IN_TRANSIT: 'yellow',
-  OUT_FOR_DELIVERY: 'purple',
-  DELIVERED: 'green',
-  CANCELLED: 'red',
+  ACKNOWLEDGED: "blue",
+  PAID: "green",
+  DISPATCHED: "orange",
+  IN_TRANSIT: "yellow",
+  OUT_FOR_DELIVERY: "purple",
+  DELIVERED: "green",
+  CANCELLED: "red",
 };
 
 const ORDER_STATUSES = [
-  'ACKNOWLEDGED', 'PAID', 'DISPATCHED',
-  'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED',
+  "ACKNOWLEDGED",
+  "PAID",
+  "DISPATCHED",
+  "IN_TRANSIT",
+  "OUT_FOR_DELIVERY",
+  "DELIVERED",
+  "CANCELLED",
 ];
 
 export default function OrdersPage() {
@@ -34,7 +53,7 @@ export default function OrdersPage() {
       setOrders(data);
     } catch (err) {
       console.error(err);
-      toast({ title: 'Failed to load orders', status: 'error' });
+      toast({ title: "Failed to load orders", status: "error" });
     } finally {
       setLoading(false);
     }
@@ -47,10 +66,10 @@ export default function OrdersPage() {
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
       await ordersApi.updateStatus(orderId, newStatus);
-      toast({ title: 'Status updated', status: 'success', duration: 2000 });
+      toast({ title: "Status updated", status: "success", duration: 2000 });
       fetchOrders();
     } catch {
-      toast({ title: 'Failed to update status', status: 'error' });
+      toast({ title: "Failed to update status", status: "error" });
     }
   };
 
@@ -64,35 +83,97 @@ export default function OrdersPage() {
 
   return (
     <Box>
-      <Text fontSize="xl" fontWeight="bold" mb={6} color="surface.900">Manage Orders</Text>
+      <Text fontSize="xl" fontWeight="bold" mb={6} color="surface.900">
+        Manage Orders
+      </Text>
       <Card>
         <CardBody>
           <Box overflowX="auto">
             <Table variant="simple" size="sm">
               <Thead bg="surface.50">
                 <Tr>
-                  <Th py={4} color="surface.600">Order ID</Th>
-                  <Th py={4} color="surface.600">Date</Th>
-                  <Th py={4} color="surface.600">Total (₹)</Th>
-                  <Th py={4} color="surface.600">Status</Th>
-                  <Th py={4} color="surface.600">Actions</Th>
+                  <Th py={4} color="surface.600">
+                    Order ID & Date
+                  </Th>
+                  <Th py={4} color="surface.600">
+                    Customer & Shipping
+                  </Th>
+                  <Th py={4} color="surface.600">
+                    Items
+                  </Th>
+                  <Th py={4} color="surface.600">
+                    Total (₹)
+                  </Th>
+                  <Th py={4} color="surface.600">
+                    Status
+                  </Th>
+                  <Th py={4} color="surface.600">
+                    Actions
+                  </Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {orders.length === 0 ? (
                   <Tr>
-                    <Td colSpan={5} textAlign="center" py={8} color="surface.500">
+                    <Td
+                      colSpan={5}
+                      textAlign="center"
+                      py={8}
+                      color="surface.500"
+                    >
                       No orders found
                     </Td>
                   </Tr>
                 ) : (
                   orders.map((order) => (
-                    <Tr key={order.id} _hover={{ bg: 'surface.50' }}>
-                      <Td fontWeight="600">#{order.id}</Td>
-                      <Td color="surface.600">{new Date(order.createdAt).toLocaleDateString()}</Td>
-                      <Td fontWeight="600">₹{parseFloat(order.totalAmount).toFixed(2)}</Td>
+                    <Tr key={order.orderNumber} _hover={{ bg: "surface.50" }}>
                       <Td>
-                        <Badge colorScheme={statusColor[order.status] || 'gray'} borderRadius="full" px={2} py={0.5}>
+                        <Text fontWeight="600">#{order.orderNumber}</Text>
+                        <Text fontSize="12px" color="surface.600">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text fontWeight="600">
+                          {order.shippingName || "Unknown"}
+                        </Text>
+                        {order.shippingPhone && (
+                          <Text fontSize="12px" color="surface.600">
+                            Phone: {order.shippingPhone}
+                          </Text>
+                        )}
+                        {order.shippingAddress && (
+                          <Text fontSize="12px" color="surface.600">
+                            {order.shippingAddress}
+                          </Text>
+                        )}
+                        {order.shippingState && (
+                          <Text fontSize="12px" color="surface.600">
+                            {order.shippingState}
+                          </Text>
+                        )}
+                      </Td>
+                      <Td>
+                        <VStack align="start" spacing={1}>
+                          {order.items?.map((item, idx) => (
+                            <Text key={idx} fontSize="12px">
+                              {item.quantity}x{" "}
+                              {item.productName ||
+                                item.productId.substring(0, 6)}
+                            </Text>
+                          ))}
+                        </VStack>
+                      </Td>
+                      <Td fontWeight="600">
+                        ₹{parseFloat(order.totalAmount).toFixed(2)}
+                      </Td>
+                      <Td>
+                        <Badge
+                          colorScheme={statusColor[order.status] || "gray"}
+                          borderRadius="full"
+                          px={2}
+                          py={0.5}
+                        >
                           {order.status}
                         </Badge>
                       </Td>
@@ -100,7 +181,9 @@ export default function OrdersPage() {
                         <Select
                           size="xs"
                           value={order.status}
-                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                          onChange={(e) =>
+                            handleStatusChange(order.id, e.target.value)
+                          }
                           borderRadius="6px"
                           w="140px"
                         >

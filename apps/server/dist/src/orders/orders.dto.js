@@ -27,6 +27,10 @@ __decorate([
 ], OrderItemDto.prototype, "quantity", void 0);
 class CheckoutDto {
     items;
+    shippingName;
+    shippingAddress;
+    shippingState;
+    shippingPhone;
 }
 exports.CheckoutDto = CheckoutDto;
 __decorate([
@@ -35,6 +39,22 @@ __decorate([
     (0, class_transformer_1.Type)(() => OrderItemDto),
     __metadata("design:type", Array)
 ], CheckoutDto.prototype, "items", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Shipping name must be a string' }),
+    __metadata("design:type", String)
+], CheckoutDto.prototype, "shippingName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Shipping address must be a string' }),
+    __metadata("design:type", String)
+], CheckoutDto.prototype, "shippingAddress", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Shipping state must be a string' }),
+    __metadata("design:type", String)
+], CheckoutDto.prototype, "shippingState", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ message: 'Shipping phone must be a string' }),
+    __metadata("design:type", String)
+], CheckoutDto.prototype, "shippingPhone", void 0);
 class VerifyPaymentDto {
     razorpayOrderId;
     razorpayPaymentId;

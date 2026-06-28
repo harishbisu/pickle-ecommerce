@@ -1,38 +1,102 @@
-'use client';
+"use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense } from "react";
 import {
-  Box, Container, Heading, Text, Button, VStack, HStack, Flex,
-  Card, CardBody, Badge, Input, InputGroup, InputRightElement,
-  Divider, Spinner, Alert, AlertIcon,
-} from '@chakra-ui/react';
+  Box,
+  Container,
+  Heading,
+  Text,
+  Button,
+  VStack,
+  HStack,
+  Flex,
+  Card,
+  CardBody,
+  Badge,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Divider,
+  Spinner,
+  Alert,
+  AlertIcon,
+} from "@chakra-ui/react";
 import {
-  Search, Package, Truck, CheckCircle, Clock, MapPin,
-  ReceiptText, ArrowRight,
-} from 'lucide-react';
-import { Navbar } from '../../components/Navbar';
-import { ordersApi, Order } from '../../lib/api';
-import { useSearchParams } from 'next/navigation';
-import { useAuth } from '../../providers/AuthContext';
-import NextLink from 'next/link';
+  Search,
+  Package,
+  Truck,
+  CheckCircle,
+  Clock,
+  MapPin,
+  ReceiptText,
+  ArrowRight,
+  ShoppingBag,
+} from "lucide-react";
+import { Navbar } from "../../components/Navbar";
+import { ordersApi, Order } from "../../lib/api";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "../../providers/AuthContext";
+import NextLink from "next/link";
 
 // ─── Step definitions ──────────────────────────────────────────────────────────
 const STATUS_STEPS = [
-  { key: 'ACKNOWLEDGED', label: 'Order Placed', subLabel: 'We received your order', icon: Package, colorKey: 'brand.500', bgKey: 'brand.50' },
-  { key: 'PAID', label: 'Payment Confirmed', subLabel: 'Payment successfully processed', icon: CheckCircle, colorKey: 'google.green', bgKey: 'google.lightGreen' },
-  { key: 'DISPATCHED', label: 'Dispatched', subLabel: 'Your order is packed & shipped', icon: Package, colorKey: '#f97316', bgKey: '#fff7ed' },
-  { key: 'IN_TRANSIT', label: 'In Transit', subLabel: 'On its way to you', icon: Truck, colorKey: '#8b5cf6', bgKey: '#f5f3ff' },
-  { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', subLabel: 'Your delivery partner is nearby', icon: MapPin, colorKey: '#f59e0b', bgKey: '#fffbeb' },
-  { key: 'DELIVERED', label: 'Delivered 🎉', subLabel: 'Enjoy your pickles!', icon: CheckCircle, colorKey: 'google.green', bgKey: 'google.lightGreen' },
+  {
+    key: "ACKNOWLEDGED",
+    label: "Order Placed",
+    subLabel: "We received your order",
+    icon: Package,
+    colorKey: "#1a73e8",
+    bgKey: "#e5f3ff",
+  },
+  {
+    key: "PAID",
+    label: "Payment Confirmed",
+    subLabel: "Payment successfully processed",
+    icon: CheckCircle,
+    colorKey: "#10b981",
+    bgKey: "#d1fae5",
+  },
+  {
+    key: "DISPATCHED",
+    label: "Dispatched",
+    subLabel: "Your order is packed & shipped",
+    icon: Package,
+    colorKey: "#f97316",
+    bgKey: "#fff7ed",
+  },
+  {
+    key: "IN_TRANSIT",
+    label: "In Transit",
+    subLabel: "On its way to you",
+    icon: Truck,
+    colorKey: "#8b5cf6",
+    bgKey: "#f5f3ff",
+  },
+  {
+    key: "OUT_FOR_DELIVERY",
+    label: "Out for Delivery",
+    subLabel: "Your delivery partner is nearby",
+    icon: MapPin,
+    colorKey: "#f59e0b",
+    bgKey: "#fffbeb",
+  },
+  {
+    key: "DELIVERED",
+    label: "Delivered",
+    subLabel: "Enjoy your pickles!",
+    icon: CheckCircle,
+    colorKey: "#10b981",
+    bgKey: "#d1fae5",
+  },
 ];
 
 const statusColorMap: Record<string, string> = {
-  ACKNOWLEDGED: 'blue',
-  PAID: 'green',
-  DISPATCHED: 'orange',
-  IN_TRANSIT: 'purple',
-  OUT_FOR_DELIVERY: 'yellow',
-  DELIVERED: 'green',
+  ACKNOWLEDGED: "blue",
+  PAID: "green",
+  DISPATCHED: "orange",
+  IN_TRANSIT: "purple",
+  OUT_FOR_DELIVERY: "yellow",
+  DELIVERED: "green",
 };
 
 function getStatusIndex(status: string) {
@@ -47,16 +111,22 @@ function OrderReceipt({ order }: { order: Order }) {
   return (
     <Card overflow="hidden">
       {/* Receipt header */}
-      <Box
-        bgGradient="linear(135deg, brand.600, brand.500)"
-        px={6} py={5}
-      >
+      <Box bgGradient="linear(135deg, brand.600, brand.500)" px={6} py={5}>
         <Flex justify="space-between" align="start">
           <Box>
-            <Text fontSize="11px" color="whiteAlpha.700" fontWeight="600" letterSpacing="0.08em" textTransform="uppercase" mb={1}>
+            <Text
+              fontSize="11px"
+              color="whiteAlpha.700"
+              fontWeight="600"
+              letterSpacing="0.08em"
+              textTransform="uppercase"
+              mb={1}
+            >
               Order ID
             </Text>
-            <Heading color="white" size="lg" fontWeight="800">#{order.id}</Heading>
+            <Heading color="white" size="lg" fontWeight="800">
+              #{order.id}
+            </Heading>
           </Box>
           <Badge
             bg="whiteAlpha.300"
@@ -68,7 +138,7 @@ function OrderReceipt({ order }: { order: Order }) {
             py={1}
             textTransform="uppercase"
           >
-            {order.status.replace(/_/g, ' ')}
+            {order.status.replace(/_/g, " ")}
           </Badge>
         </Flex>
       </Box>
@@ -76,10 +146,37 @@ function OrderReceipt({ order }: { order: Order }) {
       {/* Receipt body — GPay-style rows */}
       <CardBody p={0}>
         {[
-          ...(order.totalAmount ? [{ label: 'Total Amount', value: `₹${order.totalAmount}`, bold: true }] : []),
-          ...(order.paymentId ? [{ label: 'Payment ID', value: order.paymentId.slice(0, 24) + '...', mono: true }] : []),
-          { label: 'Order Date', value: order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—' },
-          ...(order.trackingId ? [{ label: 'Tracking ID', value: order.trackingId, mono: true }] : []),
+          ...(order.totalAmount
+            ? [
+                {
+                  label: "Total Amount",
+                  value: `₹${order.totalAmount}`,
+                  bold: true,
+                },
+              ]
+            : []),
+          ...(order.paymentId
+            ? [
+                {
+                  label: "Payment ID",
+                  value: order.paymentId.slice(0, 24) + "...",
+                  mono: true,
+                },
+              ]
+            : []),
+          {
+            label: "Order Date",
+            value: order.createdAt
+              ? new Date(order.createdAt).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })
+              : "—",
+          },
+          ...(order.trackingId
+            ? [{ label: "Tracking ID", value: order.trackingId, mono: true }]
+            : []),
         ].map(({ label, value, bold, mono }, i, arr) => (
           <Flex
             key={label}
@@ -87,17 +184,19 @@ function OrderReceipt({ order }: { order: Order }) {
             py={4}
             justify="space-between"
             align="center"
-            borderBottom={i < arr.length - 1 ? '1px dashed' : 'none'}
+            borderBottom={i < arr.length - 1 ? "1px dashed" : "none"}
             borderColor="surface.100"
-            _hover={{ bg: 'surface.50' }}
+            _hover={{ bg: "surface.50" }}
             transition="background 0.1s"
           >
-            <Text fontSize="13px" color="surface.500">{label}</Text>
+            <Text fontSize="13px" color="surface.500">
+              {label}
+            </Text>
             <Text
-              fontWeight={bold ? '800' : '600'}
-              color={bold ? 'surface.900' : 'surface.700'}
-              fontFamily={mono ? 'mono' : 'body'}
-              fontSize={mono ? '12px' : '13px'}
+              fontWeight={bold ? "800" : "600"}
+              color={bold ? "surface.900" : "surface.700"}
+              fontFamily={mono ? "mono" : "body"}
+              fontSize={mono ? "12px" : "13px"}
             >
               {value}
             </Text>
@@ -108,30 +207,58 @@ function OrderReceipt({ order }: { order: Order }) {
         {order.items && order.items.length > 0 && (
           <>
             <Box px={6} pt={4} pb={2}>
-              <Text fontSize="11px" color="surface.400" fontWeight="700" letterSpacing="0.08em" textTransform="uppercase">
+              <Text
+                fontSize="11px"
+                color="surface.400"
+                fontWeight="700"
+                letterSpacing="0.08em"
+                textTransform="uppercase"
+              >
                 Items
               </Text>
             </Box>
             {order.items.map((item) => (
               <Flex
                 key={item.id}
-                px={6} py={3}
+                px={6}
+                py={3}
                 justify="space-between"
                 align="center"
-                _hover={{ bg: 'surface.50' }}
+                _hover={{ bg: "surface.50" }}
               >
                 <HStack spacing={3}>
-                  <Box w="6px" h="6px" borderRadius="full" bg="brand.500" flexShrink={0} />
+                  <Box
+                    w="6px"
+                    h="6px"
+                    borderRadius="full"
+                    bg="brand.500"
+                    flexShrink={0}
+                  />
                   <Text fontSize="13px" color="surface.700">
-                    Product #{item.productId} <Text as="span" color="surface.400">×{item.quantity}</Text>
+                    Product #{item.productId}{" "}
+                    <Text as="span" color="surface.400">
+                      ×{item.quantity}
+                    </Text>
                   </Text>
                 </HStack>
-                <Text fontSize="13px" fontWeight="700" color="surface.900">₹{item.price}</Text>
+                <Text fontSize="13px" fontWeight="700" color="surface.900">
+                  ₹{item.price}
+                </Text>
               </Flex>
             ))}
-            <Flex px={6} py={4} justify="space-between" borderTop="2px solid" borderColor="surface.100">
-              <Text fontWeight="700" fontSize="14px" color="surface.900">Total</Text>
-              <Text fontWeight="800" fontSize="14px" color="brand.600">₹{order.totalAmount}</Text>
+            <Flex
+              px={6}
+              py={4}
+              justify="space-between"
+              borderTop="2px solid"
+              borderColor="surface.100"
+            >
+              <Text fontWeight="700" fontSize="14px" color="surface.900">
+                Total
+              </Text>
+              <Text fontWeight="800" fontSize="14px" color="brand.600">
+                ₹{order.totalAmount}
+              </Text>
             </Flex>
           </>
         )}
@@ -145,85 +272,138 @@ function DeliveryTimeline({ order }: { order: Order }) {
   const currentStep = getStatusIndex(order.status);
 
   return (
-    <Card>
+    <Card
+      borderRadius="2xl"
+      border="1px solid"
+      borderColor="surface.200"
+      overflow="hidden"
+    >
       <CardBody p={6}>
-        <HStack mb={6} spacing={2}>
-          <Truck size={18} color="#1a73e8" />
-          <Heading size="sm" color="surface.900">Delivery Progress</Heading>
+        <HStack justify="space-between" mb={7}>
+          <HStack spacing={3}>
+            <Flex
+              w="42px"
+              h="42px"
+              bg="brand.50"
+              borderRadius="xl"
+              align="center"
+              justify="center"
+            >
+              <Truck size={18} color="#1a73e8" />
+            </Flex>
+
+            <Box>
+              <Heading size="sm" color="surface.900">
+                Delivery Progress
+              </Heading>
+
+              <Text fontSize="13px" color="surface.500">
+                Track your shipment status
+              </Text>
+            </Box>
+          </HStack>
         </HStack>
 
         <VStack spacing={0} align="stretch">
           {STATUS_STEPS.map((step, idx) => {
-            const isCompleted = idx <= currentStep;
+            const isCompleted = idx < currentStep;
             const isCurrent = idx === currentStep;
             const isPending = idx > currentStep;
-            const Icon = step.icon;
             const isLast = idx === STATUS_STEPS.length - 1;
+            const Icon = step.icon;
 
             return (
-              <Flex key={step.key} gap={4} pb={isLast ? 0 : 6} position="relative">
-                {/* Connector line */}
+              <Flex
+                key={step.key}
+                gap={4}
+                pb={isLast ? 0 : 8}
+                position="relative"
+              >
                 {!isLast && (
                   <Box
                     position="absolute"
-                    left="19px"
-                    top="40px"
+                    left="21px"
+                    top="44px"
                     w="2px"
-                    h="calc(100% - 14px)"
-                    bgGradient={
-                      isCompleted && idx < currentStep
-                        ? 'linear(to-b, brand.500, brand.400)'
-                        : isPending
-                        ? 'linear(to-b, surface.200, surface.200)'
-                        : 'linear(to-b, brand.500, surface.200)'
+                    h="calc(100% - 12px)"
+                    bg={
+                      isCompleted
+                        ? "brand.500"
+                        : isCurrent
+                          ? "linear-gradient(#1A73E8,#E5E7EB)"
+                          : "surface.200"
                     }
-                    transition="all 0.4s ease"
-                    borderRadius="full"
                   />
                 )}
 
-                {/* Step icon */}
-                <Box
-                  w="40px" h="40px"
+                <Flex
+                  w="44px"
+                  h="44px"
                   borderRadius="full"
-                  bg={isCompleted ? step.bgKey : 'surface.100'}
-                  border="2.5px solid"
-                  borderColor={isCompleted ? step.colorKey : 'surface.200'}
-                  display="flex" alignItems="center" justifyContent="center"
+                  align="center"
+                  justify="center"
                   flexShrink={0}
-                  transition="all 0.35s ease"
-                  boxShadow={
-                    isCurrent
-                      ? `0 0 0 6px rgba(26,115,232,0.12), 0 0 0 12px rgba(26,115,232,0.06)`
-                      : 'none'
+                  bg={
+                    isCompleted
+                      ? step.bgKey
+                      : isCurrent
+                        ? "brand.50"
+                        : "surface.50"
                   }
-                  className={isCurrent ? 'pulse-ring' : ''}
-                  zIndex={1}
-                  position="relative"
+                  border="2px solid"
+                  borderColor={
+                    isCompleted
+                      ? step.colorKey
+                      : isCurrent
+                        ? "brand.500"
+                        : "surface.200"
+                  }
+                  boxShadow={
+                    isCurrent ? "0 6px 18px rgba(26,115,232,.15)" : "sm"
+                  }
                 >
                   <Icon
-                    size={17}
-                    color={isCompleted ? step.colorKey : '#bdc1c6'}
+                    size={18}
+                    color={isCompleted || isCurrent ? step.colorKey : "#9ca3af"}
                   />
-                </Box>
+                </Flex>
 
-                {/* Step label */}
-                <Box pt={1.5}>
+                <Box flex="1" pt={1}>
+                  <HStack justify="space-between" align="start">
+                    <Text
+                      fontWeight="600"
+                      fontSize="15px"
+                      color={isPending ? "surface.500" : "surface.900"}
+                    >
+                      {step.label}
+                    </Text>
+
+                    <Badge
+                      borderRadius="full"
+                      px={3}
+                      py={1}
+                      colorScheme={
+                        isCompleted ? "green" : isCurrent ? "blue" : "gray"
+                      }
+                      textTransform="none"
+                      fontWeight="600"
+                      fontSize="11px"
+                    >
+                      {isCompleted
+                        ? "Completed"
+                        : isCurrent
+                          ? "Current"
+                          : "Pending"}
+                    </Badge>
+                  </HStack>
+
                   <Text
-                    fontWeight={isCurrent ? '700' : isCompleted ? '600' : '400'}
-                    fontSize="14px"
-                    color={isPending ? 'surface.400' : 'surface.900'}
-                    transition="all 0.2s"
+                    mt={1}
+                    fontSize="13px"
+                    color="surface.500"
+                    lineHeight="1.5"
                   >
-                    {step.label}
-                  </Text>
-                  <Text
-                    fontSize="12px"
-                    color={isCurrent ? 'brand.500' : 'surface.400'}
-                    fontWeight={isCurrent ? '500' : '400'}
-                    mt={0.5}
-                  >
-                    {isCurrent ? `Current Status — ${step.subLabel}` : step.subLabel}
+                    {step.subLabel}
                   </Text>
                 </Box>
               </Flex>
@@ -240,29 +420,34 @@ function TrackPageContent() {
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuth();
 
-  const [orderId, setOrderId] = useState(searchParams?.get('id') || '');
+  const [orderId, setOrderId] = useState(searchParams?.get("id") || "");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
 
   useEffect(() => {
-    const id = searchParams?.get('id');
-    if (id) { setOrderId(id); handleTrack(id); }
+    const id = searchParams?.get("id");
+    if (id) {
+      setOrderId(id);
+      handleTrack(id);
+    }
   }, []);
 
   const handleTrack = async (id?: string) => {
     const trackId = id || orderId;
     if (!trackId) return;
     setLoading(true);
-    setError('');
+    setError("");
     setSearched(true);
     try {
       const data = await ordersApi.track(trackId);
-      if (!data) { setError('Order not found. Please check the order number.'); setOrder(null); }
-      else setOrder(data);
+      if (!data) {
+        setError("Order not found. Please check the order number.");
+        setOrder(null);
+      } else setOrder(data);
     } catch (err: any) {
-      setError(err.message || 'Unable to track order. Please try again.');
+      setError(err.message || "Unable to track order. Please try again.");
       setOrder(null);
     } finally {
       setLoading(false);
@@ -272,26 +457,19 @@ function TrackPageContent() {
   return (
     <Container maxW="760px" px={6} py={12}>
       <VStack spacing={8} align="stretch">
-
         {/* Header */}
         <VStack textAlign="center" spacing={2}>
-          <Box
-            w="60px" h="60px" borderRadius="20px"
-            bgGradient="linear(135deg, brand.500, brand.700)"
-            display="flex" alignItems="center" justifyContent="center"
-            boxShadow="0 4px 16px rgba(26,115,232,0.3)"
-            mb={2}
-          >
-            <ReceiptText size={26} color="white" />
-          </Box>
-          <Heading size="xl" color="surface.900" letterSpacing="-0.03em">Track Your Order</Heading>
+          <Heading size="xl" color="surface.900" letterSpacing="-0.03em">
+            Track Your Order
+          </Heading>
           <Text color="surface.500" fontSize="15px" maxW="340px">
-            Enter your order ID to get real-time delivery updates
+            Enter your order Number starting with "ORD-" to get real-time
+            delivery updates
           </Text>
         </VStack>
 
         {/* Search card */}
-        <Card>
+        <Card borderRadius="xl">
           <CardBody p={6}>
             <InputGroup size="lg">
               <Input
@@ -299,18 +477,21 @@ function TrackPageContent() {
                 placeholder="Order Number (e.g. ORD-XXX)"
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
-                borderRadius="12px"
-                fontSize="15px"
-                onKeyDown={(e) => e.key === 'Enter' && handleTrack()}
+                onKeyDown={(e) => e.key === "Enter" && handleTrack()}
                 type="text"
                 bg="surface.50"
-                _focus={{ bg: 'white' }}
+                borderRadius="12px"
+                fontSize="15px"
+                autoComplete="off"
+                pr="120px"
+                _focus={{ bg: "white" }}
               />
-              <InputRightElement w="auto" pr={1.5} h="full">
+
+              <InputRightElement width="110px" h="100%">
                 <Button
                   id="track-search-btn"
-                  h="44px"
-                  px={6}
+                  w="100px"
+                  h="40px"
                   borderRadius="10px"
                   leftIcon={<Search size={15} />}
                   onClick={() => handleTrack()}
@@ -331,8 +512,15 @@ function TrackPageContent() {
         {loading && (
           <Flex justify="center" py={10}>
             <VStack spacing={3}>
-              <Spinner size="lg" color="brand.500" thickness="3px" speed="0.65s" />
-              <Text color="surface.400" fontSize="14px">Fetching order details...</Text>
+              <Spinner
+                size="lg"
+                color="brand.500"
+                thickness="3px"
+                speed="0.65s"
+              />
+              <Text color="surface.400" fontSize="14px">
+                Fetching order details...
+              </Text>
             </VStack>
           </Flex>
         )}
@@ -357,17 +545,19 @@ function TrackPageContent() {
         {!loading && !order && !error && !searched && (
           <VStack py={16} spacing={4} textAlign="center">
             <Box fontSize="60px">📦</Box>
-            <Text color="surface.400" fontSize="15px">Enter your order ID above to track your delivery</Text>
+            <Text color="surface.400" fontSize="15px">
+              Enter your order ID above to track your delivery
+            </Text>
             {isAuthenticated && (
               <Button
                 as={NextLink}
                 href="/shop"
-                variant="outline"
-                size="sm"
-                borderRadius="full"
-                rightIcon={<ArrowRight size={14} />}
+                size="lg"
+                borderRadius="24px"
+                leftIcon={<ShoppingBag size={18} />}
+                px={8}
               >
-                Browse Shop
+                Browse Pickles
               </Button>
             )}
           </VStack>
@@ -382,11 +572,13 @@ export default function TrackPage() {
   return (
     <Box minH="100vh" bg="surface.50">
       <Navbar />
-      <Suspense fallback={
-        <Flex justify="center" align="center" py={24}>
-          <Spinner size="lg" color="brand.500" thickness="3px" />
-        </Flex>
-      }>
+      <Suspense
+        fallback={
+          <Flex justify="center" align="center" py={24}>
+            <Spinner size="lg" color="brand.500" thickness="3px" />
+          </Flex>
+        }
+      >
         <TrackPageContent />
       </Suspense>
     </Box>

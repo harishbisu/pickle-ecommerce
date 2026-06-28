@@ -55,7 +55,7 @@ export default function CartPage() {
         description: "You need to be signed in to checkout",
         status: "warning",
         duration: 3000,
-        position: "top-right",
+        position: "bottom-right",
       });
       router.push("/login?redirect=/checkout");
       return;
@@ -203,13 +203,10 @@ export default function CartPage() {
                           <Text fontWeight="700" color="surface.900">
                             ₹
                             {(
-                              (item.price -
-                                (parseFloat(item.discount || "0") *
-                                  item.price) /
-                                  100) *
+                              (item.price - parseFloat(item.discount || "0")) *
                               item.quantity
                             ).toFixed(0)}
-                            {item.discount != "0" && (
+                            {parseFloat(item.discount || "0") != 0 && (
                               <Text
                                 as="span"
                                 fontWeight="400"
@@ -217,7 +214,7 @@ export default function CartPage() {
                                 color="red.500"
                                 textDecor={"line-through"}
                               >
-                                ₹{item.price}
+                                ₹{item.price * item.quantity}
                               </Text>
                             )}
                           </Text>

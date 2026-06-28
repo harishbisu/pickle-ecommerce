@@ -38,7 +38,7 @@ export function Navbar() {
       <Flex
         maxW="1280px"
         mx="auto"
-        px={{ base: 4, md: 8 }}
+        px={{ base: 4, md: 8, lg: 0 }}
         h="64px"
         align="center"
         justify="space-between"
@@ -46,7 +46,7 @@ export function Navbar() {
       >
         {/* Logo */}
         <Flex
-          align="center"
+          align="left"
           as={NextLink}
           href="/"
           textDecoration="none"
@@ -95,7 +95,7 @@ export function Navbar() {
                 <Flex align="center" gap={2}>
                   <User size={18} />
                   <Text display={{ base: "none", md: "flex" }}>
-                    {user?.email?.split(" ")[0]}
+                    {user?.name || user?.email?.split("@")[0]}
                   </Text>
                 </Flex>
               </MenuButton>
@@ -117,7 +117,7 @@ export function Navbar() {
                 )}
                 <MenuItem
                   as={NextLink}
-                  href="/orders"
+                  href="/profile"
                   icon={<Package size={16} />}
                   py={3}
                   _hover={{ bg: "surface.50" }}

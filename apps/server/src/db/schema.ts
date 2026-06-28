@@ -15,7 +15,9 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash'),
   googleId: text('google_id'),
   role: text('role').notNull().default('USER'), // USER, ADMIN
+  name: text('name'),
   address: text('address'),
+  state: text('state'),
   phone: text('phone'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
@@ -46,6 +48,10 @@ export const orders = pgTable('orders', {
   status: text('status').notNull().default('ACKNOWLEDGED'), // ACKNOWLEDGED, DISPATCHED, IN_TRANSIT, OUT_FOR_DELIVERY, DELIVERED
   paymentId: text('payment_id'),
   trackingId: text('tracking_id'), // courier tracking
+  shippingName: text('shipping_name'),
+  shippingAddress: text('shipping_address'),
+  shippingState: text('shipping_state'),
+  shippingPhone: text('shipping_phone'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
