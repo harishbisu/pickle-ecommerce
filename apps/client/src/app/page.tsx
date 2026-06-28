@@ -15,6 +15,7 @@ import {
   Badge,
   VStack,
   HStack,
+  Skeleton,
 } from "@chakra-ui/react";
 import {
   ShoppingBag,
@@ -70,7 +71,6 @@ export default function Home() {
     productsApi
       .list()
       .then((data) => {
-        // Filter for featured products, or just take the first 3 if none are marked featured
         const featured = data.filter((p) => p.isFeatured);
         if (featured.length >= 3) {
           setFeaturedProducts(featured.slice(0, 3));
@@ -364,110 +364,130 @@ export default function Home() {
         </Flex>
 
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={6}>
-          {featuredProducts.map((product) => (
-            <Card
-              key={product.id}
-              as={NextLink}
-              href={`/shop/${product.slug || product.id}`}
-              overflow="hidden"
-              _hover={{ transform: "translateY(-4px)", boxShadow: "lg" }}
-              transition="all 0.2s ease"
-              cursor="pointer"
-              borderRadius="xl"
-            >
-              <Box position="relative">
-                <Image
-                  src={
-                    product.images?.[0] ||
-                    "https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=400"
-                  }
-                  alt={product.name}
-                  h="400px"
-                  w="full"
-                  objectFit="cover"
-                />
-                <Badge
-                  position="absolute"
-                  top={3}
-                  left={3}
-                  colorScheme="orange"
-                  borderRadius="full"
-                  fontSize="11px"
-                  fontWeight="700"
-                  px={3}
-                  py={1}
+          {featuredProducts.length === 0
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <Box
+                  key={i}
+                  borderRadius="12px"
+                  overflow="hidden"
+                  bg="white"
+                  border="1px solid"
+                  borderColor="surface.200"
+                  boxShadow="sm"
                 >
-                  {product.isFeatured ? "Featured" : "Trending"}
-                </Badge>
-              </Box>
-              <CardBody p={5}>
-                <Stack spacing={3} justify="space-between" h="full">
-                  <VStack align="strech" spacing={1}>
-                    <Heading size="sm" color="surface.900">
-                      {product.name}
-                    </Heading>
-                    <Text fontSize="13px" color="surface.500" noOfLines={1}>
-                      {product.description}
-                    </Text>
-                  </VStack>
-                  <VStack align="strech" spacing={1}>
-                    <HStack>
-                      <Text fontSize="12px" color="google.yellow">
-                        {"★".repeat(5)}
-                      </Text>
-                      <Text fontSize="12px" color="surface.600">
-                        4.8
-                      </Text>
-                      <Text fontSize="12px" color="surface.400">
-                        (120)
-                      </Text>
-                    </HStack>
-                    <Flex align="center" justify="space-between">
-                      <HStack spacing={2} align="baseline">
-                        <Text
-                          fontWeight="700"
-                          fontSize="lg"
-                          color="surface.900"
-                        >
-                          ₹
-                          {parseFloat(product.price) -
-                            parseFloat(product.discount || "0")}
-                        </Text>
-                        {parseFloat(product.discount || "0") && (
-                          <Text
-                            fontSize="13px"
-                            color="surface.400"
-                            textDecoration="line-through"
-                          >
-                            ₹{product.price}
-                          </Text>
-                        )}
-                      </HStack>
-                      {parseFloat(product.discount || "") != 0 && (
-                        <Badge colorScheme="green" fontSize="11px">
-                          {(
-                            (parseFloat(product.discount || "0") /
-                              parseFloat(product.price)) *
-                            100
-                          ).toFixed(0)}
-                          % off
-                        </Badge>
-                      )}
-                    </Flex>
-                    <Button
+                  <Skeleton height="300px" />
+                  <Box p={4}>
+                    <Skeleton height="16px" mb={2} borderRadius="6px" />
+                    <Skeleton height="12px" mb={1} borderRadius="6px" />
+                    <Skeleton height="12px" mb={3} w="60%" borderRadius="6px" />
+                    <Skeleton height="36px" borderRadius="10px" />
+                  </Box>
+                </Box>
+              ))
+            : featuredProducts.map((product) => (
+                <Card
+                  key={product.id}
+                  as={NextLink}
+                  href={`/shop/${product.slug || product.id}`}
+                  overflow="hidden"
+                  _hover={{ transform: "translateY(-4px)", boxShadow: "lg" }}
+                  transition="all 0.2s ease"
+                  cursor="pointer"
+                  borderRadius="xl"
+                >
+                  <Box position="relative">
+                    <Image
+                      src={
+                        product.images?.[0] ||
+                        "https://images.unsplash.com/photo-1627308595171-d1b5d6721b06?w=400"
+                      }
+                      alt={product.name}
+                      h="400px"
                       w="full"
-                      size="sm"
-                      borderRadius="8px"
-                      leftIcon={<ShoppingBag size={14} />}
-                      onClick={(e) => handleAddToCart(e, product)}
+                      objectFit="cover"
+                    />
+                    <Badge
+                      position="absolute"
+                      top={3}
+                      left={3}
+                      colorScheme="orange"
+                      borderRadius="full"
+                      fontSize="11px"
+                      fontWeight="700"
+                      px={3}
+                      py={1}
                     >
-                      Add to Cart
-                    </Button>
-                  </VStack>
-                </Stack>
-              </CardBody>
-            </Card>
-          ))}
+                      {product.isFeatured ? "Featured" : "Trending"}
+                    </Badge>
+                  </Box>
+                  <CardBody p={5}>
+                    <Stack spacing={3} justify="space-between" h="full">
+                      <VStack align="strech" spacing={1}>
+                        <Heading size="sm" color="surface.900">
+                          {product.name}
+                        </Heading>
+                        <Text fontSize="13px" color="surface.500" noOfLines={1}>
+                          {product.description}
+                        </Text>
+                      </VStack>
+                      <VStack align="strech" spacing={1}>
+                        <HStack>
+                          <Text fontSize="12px" color="google.yellow">
+                            {"★".repeat(5)}
+                          </Text>
+                          <Text fontSize="12px" color="surface.600">
+                            4.8
+                          </Text>
+                          <Text fontSize="12px" color="surface.400">
+                            (120)
+                          </Text>
+                        </HStack>
+                        <Flex align="center" justify="space-between">
+                          <HStack spacing={2} align="baseline">
+                            <Text
+                              fontWeight="700"
+                              fontSize="lg"
+                              color="surface.900"
+                            >
+                              ₹
+                              {parseFloat(product.price) -
+                                parseFloat(product.discount || "0")}
+                            </Text>
+                            {parseFloat(product.discount || "0") && (
+                              <Text
+                                fontSize="13px"
+                                color="surface.400"
+                                textDecoration="line-through"
+                              >
+                                ₹{product.price}
+                              </Text>
+                            )}
+                          </HStack>
+                          {parseFloat(product.discount || "") != 0 && (
+                            <Badge colorScheme="green" fontSize="11px">
+                              {(
+                                (parseFloat(product.discount || "0") /
+                                  parseFloat(product.price)) *
+                                100
+                              ).toFixed(0)}
+                              % off
+                            </Badge>
+                          )}
+                        </Flex>
+                        <Button
+                          w="full"
+                          size="sm"
+                          borderRadius="8px"
+                          leftIcon={<ShoppingBag size={14} />}
+                          onClick={(e) => handleAddToCart(e, product)}
+                        >
+                          Add to Cart
+                        </Button>
+                      </VStack>
+                    </Stack>
+                  </CardBody>
+                </Card>
+              ))}
         </SimpleGrid>
       </Container>
     </Box>

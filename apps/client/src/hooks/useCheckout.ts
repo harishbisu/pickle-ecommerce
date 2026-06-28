@@ -11,7 +11,6 @@ import CryptoJS from "crypto-js";
 
 const SECRET_KEY = "offline_sync_secret_key";
 
-
 export function useCheckout() {
   const { items, totalAmount, clearCart } = useCart();
   const { isAuthenticated, user } = useAuth();
@@ -173,22 +172,26 @@ export function useCheckout() {
             }
           } catch (verifyErr: any) {
             console.error("Payment verification error:", verifyErr);
-            
+
             // Network or server error - save for offline sync
             const payload = {
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             };
-            const encrypted = CryptoJS.AES.encrypt(JSON.stringify(payload), SECRET_KEY).toString();
+            const encrypted = CryptoJS.AES.encrypt(
+              JSON.stringify(payload),
+              SECRET_KEY,
+            ).toString();
             localStorage.setItem("pending_payment_verification", encrypted);
-            
+
             clearCart();
             setOrderSuccess({ orderNumber: "Pending Sync" });
 
             toast({
               title: "Connection Lost",
-              description: "Your payment was processed. We will securely verify your order in the background once you are back online.",
+              description:
+                "Your payment was processed. We will securely verify your order in the background once you are back online.",
               status: "info",
               duration: 8000,
               position: "top",

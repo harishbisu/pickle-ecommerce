@@ -192,11 +192,7 @@ function ProductCard({
                   <Text
                     key={star}
                     fontSize="11px"
-                    color={
-                      star <= Math.round(rating)
-                        ? "google.yellow"
-                        : "surface.300"
-                    }
+                    color={star <= Math.round(rating) ? "#F4B400" : "#0072C6"}
                   >
                     ★
                   </Text>
@@ -330,7 +326,13 @@ export default function ShopPage() {
 
       {/* ── Hero Banner ──────────────────────────────────────────────── */}
       <Box
-        bgGradient="linear(135deg, brand.700 0%, brand.500 50%, #4285f4 100%)"
+        bgImage={`
+          linear-gradient(135deg, #1e63d8 0%, #4285f4 45%, rgba(66, 133, 244, 0.65) 70%, rgba(52, 168, 83, 0.5) 100%),
+          url('/home.jpeg')
+        `}
+        bgRepeat="no-repeat"
+        bgPosition="center, right"
+        bgSize="cover, auto 100%"
         py={{ base: 4, md: 14 }}
         px={{ base: 4, md: 6 }}
         position="relative"
@@ -369,7 +371,7 @@ export default function ShopPage() {
                 color="white"
                 borderRadius="full"
                 fontSize="11px"
-                fontWeight="600"
+                fontWeight="500"
                 px={3}
                 py={1}
                 mb={3}
@@ -377,13 +379,24 @@ export default function ShopPage() {
                 🥒 Authentic Rajasthan Flavours
               </Badge>
               <Heading
-                color="white"
+                color="#DAA520"
                 fontSize={{ base: "2xl", md: "4xl" }}
                 fontWeight="800"
                 letterSpacing="-0.03em"
-                mb={2}
+                // mb={2}
               >
-                Taste the Soul of Rajasthan
+                Taste the Soul of
+                <Text
+                  as={"span"}
+                  color="transparent"
+                  fontWeight={"bold"}
+                  sx={{ WebkitTextStroke: "2px #DAA520" }}
+                  fontSize={{ base: "3xl", md: "5xl" }}
+                  letterSpacing="-0.03em"
+                >
+                  {" "}
+                  RAJASTHAN
+                </Text>
               </Heading>
               <Text
                 color="whiteAlpha.800"

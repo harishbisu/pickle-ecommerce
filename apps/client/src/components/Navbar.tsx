@@ -23,7 +23,7 @@ export function Navbar() {
   const { totalItems } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <Box
@@ -31,9 +31,10 @@ export function Navbar() {
       position="sticky"
       top={0}
       zIndex={200}
-      bg="#2874f0" // Flipkart Blue
+      bg="#1e63d8"
       color="white"
-      boxShadow="0 2px 4px 0 rgba(0,0,0,.2)"
+      opacity={1}
+      // boxShadow="0 2px 4px 0 rgba(0,0,0,.2)"
     >
       <Flex
         maxW="1280px"
