@@ -16,16 +16,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Pickle Hub — Authentic Traditional Pickles",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://picklehub.com'),
+  title: "Pickle Hub — Authentic Traditional Rajasthani Pickles",
   description:
-    "Buy authentic, homemade traditional pickles online. From spicy mango to mixed veg, taste the tradition. Fresh, natural, and delivered to your door.",
+    "Buy authentic, homemade traditional Rajasthani pickles online. From spicy mango to mixed veg, taste the true tradition. No preservatives, 100% natural, delivered to your door.",
   keywords:
-    "pickles, mango pickle, traditional pickles, buy pickles online india, homemade achaar",
+    "Achar, Achaar, Pickle, Homemade achar, Ghar ka achar, Desi achar, Traditional achar, Handmade achar, Pure achar, Oil pickle, Marwadi achar, Rajasthani achar, Rajasthan pickle, Marwari mango pickle, Keri ka achar, Kairi ka achar, Marwadi keri achar, Marwadi mirchi achar, Rajasthan homemade pickle, आम का अचार, नींबू का अचार, मिर्च का अचार, लहसुन का अचार, मिक्स अचार, घर का अचार, देसी अचार, राजस्थानी अचार, मारवाड़ी अचार, बिना प्रिजर्वेटिव अचार, Mango pickle, Lemon pickle, Green chilli pickle, Red chilli pickle, Garlic pickle, Mixed pickle, Stuffed red chilli pickle, Sweet mango pickle, Spicy mango pickle, Ker Sangri pickle, Buy achar online, Best achar online, Homemade pickle online, Achar delivery, Pickle near me, Authentic Rajasthani achar, Organic pickle, No preservative pickle, Homemade mango pickle, Sikar Achar online",
   openGraph: {
-    title: "Pickle Hub — Authentic Traditional Pickles",
-    description: "Authentic homemade pickles delivered to your door.",
+    title: "Pickle Hub — Authentic Traditional Rajasthani Pickles",
+    description: "Authentic homemade Rajasthani pickles delivered to your door. Pure, organic, and preservative-free.",
     type: "website",
     siteName: "Pickle Hub",
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pickle Hub — Authentic Traditional Rajasthani Pickles',
+    description: 'Authentic homemade Rajasthani pickles delivered to your door. Pure, organic, and preservative-free.',
   },
   robots: {
     index: true,
