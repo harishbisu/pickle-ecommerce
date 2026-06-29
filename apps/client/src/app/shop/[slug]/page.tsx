@@ -4,12 +4,12 @@ import ProductClient from "./ProductClient";
 async function getProduct(slug: string) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   try {
-    const res = await fetch(`${API_URL}/products`, {
+    const res = await fetch(`${API_URL}/products/${slug}`, {
       next: { revalidate: 60 },
     });
     if (res.ok) {
       const data = await res.json();
-      return data.find((p: any) => p.slug === slug || p.id === slug) || null;
+      return data || null;
     }
   } catch (error) {
     console.error("Failed to fetch product", error);
@@ -80,7 +80,7 @@ export default async function ProductPage({
       sku: product.id,
       offers: {
         "@type": "Offer",
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://picklehub.com"}/shop/${product.slug || product.id}`,
+        url: `${"https://picklehub.com"}/shop/${product.slug || product.id}`,
         priceCurrency: "INR",
         price: priceAfterDiscount,
         availability:

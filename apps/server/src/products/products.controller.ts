@@ -17,7 +17,7 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
-  @Get(':id')
+  @Get(':id')//assuming id or slug
   async findOne(@Param('id') id: string) {
     return this.productsService.findById(id);
   }

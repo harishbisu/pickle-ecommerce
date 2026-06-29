@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://picklehub.com'),
+  metadataBase: new URL('https://picklehub.com'),
   title: "Pickle Hub — Authentic Traditional Rajasthani Pickles",
   description:
     "Buy authentic, homemade traditional Rajasthani pickles online. From spicy mango to mixed veg, taste the true tradition. No preservatives, 100% natural, delivered to your door.",
@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.className}>
+    <html lang="en" className={inter.className} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

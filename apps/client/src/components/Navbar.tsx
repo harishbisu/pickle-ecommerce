@@ -39,7 +39,7 @@ export function Navbar() {
       <Flex
         maxW="1280px"
         mx="auto"
-        px={{ base: 4, md: 8, lg: 0 }}
+        px={{ base: 4, md: 8, xl: 0 }}
         h="64px"
         align="center"
         justify="space-between"

@@ -52,8 +52,8 @@ export default async function Page() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Pickle Hub",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://picklehub.com",
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://picklehub.com"}/logo.webp`,
+    url: "https://picklehub.com",
+    logo: `${"https://picklehub.com"}/logo.webp`,
     description: "Authentic handmade Rajasthani pickles and achar.",
     contactPoint: {
       "@type": "ContactPoint",
