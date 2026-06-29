@@ -32,6 +32,7 @@ import { useToast } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { productsApi } from "../lib/api";
 import { Product } from "../types";
+import FAQSection from "@/components/FAQSection";
 
 // We will load featured products dynamically.
 
@@ -490,6 +491,7 @@ export default function Home() {
               ))}
         </SimpleGrid>
       </Container>
+      <FAQSection />
     </Box>
   );
 }
