@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = "Authentic Homemade Pickles — Pickle Hub";
   const description =
     "Shop the best authentic Rajasthani pickles online. Buy homemade mango, lemon, garlic, and mixed achar made with love and no preservatives.";
-  const keywords = "Buy achar online, Best achar online, Homemade pickle online, Authentic Rajasthani achar, Organic pickle, No preservative pickle, Homemade mango pickle";
+  const keywords =
+    "Buy achar online, Best achar online, Homemade pickle online, Authentic Rajasthani achar, Organic pickle, No preservative pickle, Homemade mango pickle";
 
   return {
     title,
@@ -33,11 +34,14 @@ export default async function Page() {
   let initialFeaturedProducts = [];
 
   try {
-    const res = await fetch(`${API_URL}/products`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/products`, {
+      next: { revalidate: 60 },
+    });
     if (res.ok) {
       const data = await res.json();
       const featured = data.filter((p: any) => p.isFeatured);
-      initialFeaturedProducts = featured.length >= 3 ? featured.slice(0, 3) : data.slice(0, 3);
+      initialFeaturedProducts =
+        featured.length >= 3 ? featured.slice(0, 3) : data.slice(0, 3);
     }
   } catch (error) {
     console.error("Failed to fetch featured products server-side", error);
